@@ -5,7 +5,7 @@ class AfiliacionNaturalForm(forms.ModelForm):
     class Meta:
         model = AfiliacionNatural
         fields = [
-            'tipo_persona',  # Añadido aquí
+            'tipo_persona',
             'nombre_comercial_o_nombres', 'ruc_o_cedula', 'direccion_principal', 'calle', 'numero',
             'calle_interseccion', 'referencia', 'edificio', 'piso', 'oficina', 'parroquia', 'ciudad',
             'pais', 'pagina_web', 'correo_electronico', 'telefono', 'red_social_whatsapp',
@@ -16,11 +16,31 @@ class AfiliacionNaturalForm(forms.ModelForm):
             'tipo_persona': forms.HiddenInput(),
         }
 
+    def clean_ruc_o_cedula(self):
+        cedula = self.cleaned_data.get('ruc_o_cedula')
+        if not cedula.isdigit():
+            raise forms.ValidationError("La cédula debe contener solo números.")
+        if len(cedula) != 10:
+            raise forms.ValidationError("La cédula debe tener exactamente 10 dígitos.")
+        return cedula
+
+    def clean_numero(self):
+        numero = self.cleaned_data.get('numero')
+        if numero and not numero.isdigit():
+            raise forms.ValidationError("El campo 'Número' debe contener solo números.")
+        return numero
+
+    def clean_piso(self):
+        piso = self.cleaned_data.get('piso')
+        if piso and not piso.isdigit():
+            raise forms.ValidationError("El campo 'Piso' debe contener solo números.")
+        return piso
+
 class AfiliacionJuridicaForm(forms.ModelForm):
     class Meta:
         model = AfiliacionJuridica
         fields = [
-            'tipo_persona',  # Añadido aquí
+            'tipo_persona',
             'razon_social', 'nombre_comercial_o_nombres', 'ruc_o_cedula', 'rep_legal_cedula_pasaporte',
             'rep_legal_apellido1', 'rep_legal_apellido2', 'rep_legal_nombres', 'direccion_principal',
             'calle', 'numero', 'calle_interseccion', 'referencia', 'edificio', 'piso', 'oficina',
@@ -38,4 +58,16 @@ class AfiliacionJuridicaForm(forms.ModelForm):
         widgets = {
             'tipo_persona': forms.HiddenInput(),
         }
+
+    def clean_numero(self):
+        numero = self.cleaned_data.get('numero')
+        if numero and not numero.isdigit():
+            raise forms.ValidationError("El campo 'Número' debe contener solo números.")
+        return numero
+
+    def clean_piso(self):
+        piso = self.cleaned_data.get('piso')
+        if piso and not piso.isdigit():
+            raise forms.ValidationError("El campo 'Piso' debe contener solo números.")
+        return piso
 
