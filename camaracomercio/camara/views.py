@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
 from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial
@@ -8,7 +10,12 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 
 # Create your views here.
-def home(request): return render(request, 'vista_publica/home.html')
+def home(request):
+    # Si el usuario es superusuario o staff, redirige al admin
+    if request.user.is_authenticated and (request.user.is_superuser or request.user.is_staff):
+        return redirect('/admin/')
+    return render(request, 'vista_publica/home.html')
+
 def login_view(request):
     if request.method == 'POST':
         identificador = request.POST.get('identificador')
@@ -17,12 +24,13 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.is_superuser:
-                return redirect('/admin/')  # Redirige al admin Django
+                return redirect('admin_home')  # Redirige a tu panel adminview
             else:
                 return redirect('dashboard')
         else:
             messages.error(request, 'Credenciales inválidas.')
     return render(request, 'vista_publica/login.html')
+
 def registro(request):
     tipo = request.POST.get('tipo_usuario', 'persona')
     if request.method == 'POST':
@@ -50,10 +58,16 @@ def registro(request):
         'empresa_form': empresa_form,
         'tipo': tipo
     })
+
 def afiliacion(request): return render(request, 'vista_publica/afiliacion.html')
 def convenios(request): return render(request, 'vista_publica/convenios.html')
 def faq(request): return render(request, 'vista_publica/faq.html')
+
+@login_required
 def dashboard(request):
+    # Solo usuarios normales pueden acceder, no superusuarios ni staff
+    if request.user.is_superuser or request.user.is_staff:
+        return redirect('/admin/')
     # Puedes personalizar la lógica según tu modelo
     reservas = []  # Ejemplo: Reserva.objects.filter(usuario=request.user)
     notificaciones = []  # Ejemplo: Notificacion.objects.filter(usuario=request.user)
@@ -61,37 +75,52 @@ def dashboard(request):
         'reservas': reservas,
         'notificaciones': notificaciones,
     })
+
+@login_required
 def perfil_usuario(request):
     # Puedes personalizar la lógica según tu modelo
     return render(request, 'vista_socio_registrado/perfil_usuario.html')
+
+@login_required
 def historial_reservas(request):
     # Puedes personalizar la lógica según tu modelo
     reservas = []  # Ejemplo: Reserva.objects.filter(usuario=request.user)
     return render(request, 'vista_socio_registrado/historial_reservas.html', {'reservas': reservas})
+
+@login_required
 def notificaciones(request):
     # Puedes personalizar la lógica según tu modelo
     notificaciones = []  # Ejemplo: Notificacion.objects.filter(usuario=request.user)
     return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
+
 def logout_view(request):
     logout(request)
     return redirect('home')
 
+# Vistas de administración con permisos
+@permission_required('camara.view_afiliacionnatural', login_url='/login/')
 def admin_home(request):
-    return render(request, 'admin/home.html')
+    return render(request, 'adminview/home.html')
 
+@permission_required('camara.view_afiliacionnatural', login_url='/login/')
 def afiliaciones_pendientes(request):
     pendientes_natural = AfiliacionNatural.objects.filter(estado='pendiente')
     pendientes_juridica = AfiliacionJuridica.objects.filter(estado='pendiente')
-    return render(request, 'admin/afiliaciones_pendientes.html', {
-        'pendientes_natural': pendientes_natural,
-        'pendientes_juridica': pendientes_juridica,
+    pendientes = list(pendientes_natural) + list(pendientes_juridica)
+    return render(request, 'adminview/afiliaciones_pendientes.html', {
+        'pendientes': pendientes,
     })
 
+@permission_required('camara.change_afiliacionnatural', login_url='/login/')
 def detalle_afiliacion(request, pk):
-    # Buscar en ambos modelos
-    afiliacion = get_object_or_404(
-        AfiliacionNatural.objects.all() | AfiliacionJuridica.objects.all(), pk=pk
-    )
+    # Intentar buscar primero en AfiliacionNatural, luego en AfiliacionJuridica
+    try:
+        afiliacion = AfiliacionNatural.objects.get(pk=pk)
+    except AfiliacionNatural.DoesNotExist:
+        try:
+            afiliacion = AfiliacionJuridica.objects.get(pk=pk)
+        except AfiliacionJuridica.DoesNotExist:
+            raise Http404("Afiliación no encontrada")
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -137,4 +166,4 @@ def detalle_afiliacion(request, pk):
 
         return redirect('afiliaciones_pendientes')
 
-    return render(request, 'admin/detalle_afiliacion.html', {'afiliacion': afiliacion})
+    return render(request, 'adminview/detalle_afiliacion.html', {'afiliacion': afiliacion})

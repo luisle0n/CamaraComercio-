@@ -1,0 +1,40 @@
+{% extends "master.html" %}
+{% block title %}Detalle Afiliación{% endblock %}
+{% block content %}
+<h2>Detalle de afiliación</h2>
+
+{% if afiliacion.tipo_persona == 'natural' %}
+    <p><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</p>
+    <p><strong>RUC o cédula:</strong> {{ afiliacion.ruc_o_cedula }}</p>
+{% else %}
+    <p><strong>Razón social:</strong> {{ afiliacion.razon_social }}</p>
+    <p><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</p>
+    <p><strong>RUC:</strong> {{ afiliacion.ruc_o_cedula }}</p>
+    <p><strong>Representante legal:</strong> {{ afiliacion.rep_legal_nombres }} {{ afiliacion.rep_legal_apellido1 }}</p>
+{% endif %}
+
+<p><strong>Correo:</strong> {{ afiliacion.correo_electronico }}</p>
+<p><strong>Tipo de persona:</strong> {{ afiliacion.get_tipo_persona_display }}</p>
+<p><strong>Estado:</strong> {{ afiliacion.get_estado_display }}</p>
+<p><strong>Fecha de solicitud:</strong> {{ afiliacion.fecha_solicitud }}</p>
+<p><strong>Comprobante de pago:</strong>
+    {% if afiliacion.comprobante_pago %}
+        <a href="{{ afiliacion.comprobante_pago.url }}" target="_blank">Ver archivo</a>
+    {% else %}
+        No adjuntado
+    {% endif %}
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    {% if afiliacion.estado == 'pendiente' %}
+        <button type="submit" name="action" value="aprobar" class="btn btn-success">✅ Aprobar</button>
+        <button type="submit" name="action" value="rechazar" class="btn btn-danger">❌ Rechazar</button>
+    {% else %}
+        <p><em>Esta afiliación ya ha sido procesada.</em></p>
+    {% endif %}
+</form>
+
+<a href="{% url 'afiliaciones_pendientes' %}" class="btn btn-secondary">Volver a la lista</a>
+
+{% endblock %}

@@ -45,7 +45,7 @@
                 </ul>
                 
                 <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and not user.is_superuser and not user.is_staff %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user me-1"></i>{{ user.first_name|default:user.username }}
