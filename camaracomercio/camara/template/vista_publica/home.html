@@ -1,0 +1,46 @@
+{% extends "master.html" %}
+{% block title %}Inicio - Cámara de Comercio{% endblock %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1>Bienvenido a la Cámara de Comercio de Loja</h1>
+    <p>Promoviendo el desarrollo económico de la provincia de Loja desde 1950.</p>
+    <a href="{% url 'login' %}" class="btn btn-primary me-2">Iniciar Sesión</a>
+    <a href="{% url 'registro' %}" class="btn btn-outline-primary">Registrarse</a>
+</div>
+
+<!-- Sección informativa -->
+<div class="container my-5">
+    <h2 class="text-center mb-3 porque-titulo">¿Por qué ser parte de nuestra institución?</h2>
+    <p class="text-center mb-5 porque-descripcion">Somos el gremio que impulsa el desarrollo económico de Loja, brindando apoyo integral a empresarios y emprendedores.</p>
+    <div class="row justify-content-center">
+        <div class="col-6 col-md-3 mb-4 text-center">
+            <div class="porque-icon-bg">
+                <i class="fa-solid fa-building fa-2x porque-icon"></i>
+            </div>
+            <h5 class="porque-subtitulo">Representación Gremial</h5>
+            <p class="porque-texto">Defendemos los intereses de comerciantes, empresarios y emprendedores de Loja.</p>
+        </div>
+        <div class="col-6 col-md-3 mb-4 text-center">
+            <div class="porque-icon-bg">
+                <i class="fa-solid fa-award fa-2x porque-icon"></i>
+            </div>
+            <h5 class="porque-subtitulo">Convenios Empresariales</h5>
+            <p class="porque-texto">Accede a descuentos especiales en servicios financieros, hotelería, consultoría y más.</p>
+        </div>
+        <div class="col-6 col-md-3 mb-4 text-center">
+            <div class="porque-icon-bg">
+                <i class="fa-solid fa-chart-line fa-2x porque-icon"></i>
+            </div>
+            <h5 class="porque-subtitulo">Desarrollo Económico</h5>
+            <p class="porque-texto">Promovemos el crecimiento económico local y el fortalecimiento empresarial.</p>
+        </div>
+        <div class="col-6 col-md-3 mb-4 text-center">
+            <div class="porque-icon-bg">
+                <i class="fa-solid fa-handshake fa-2x porque-icon"></i>
+            </div>
+            <h5 class="porque-subtitulo">Networking Empresarial</h5>
+            <p class="porque-texto">Conecta con otros empresarios y genera oportunidades de negocio.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

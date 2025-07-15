@@ -1,0 +1,19 @@
+{% extends "master.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:400px;">
+    <h2 class="mb-4 text-center">Iniciar Sesión</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="identificador" class="form-label">Cédula o Correo</label>
+            <input type="text" class="form-control" id="identificador" name="identificador" required>
+        </div>
+        <div class="mb-3">
+            <label for="contrasena" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+    </form>
+</div>
+{% endblock %}

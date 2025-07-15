@@ -1,0 +1,15 @@
+{% extends "master.html" %}
+{% block title %}Descargar Recibo{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <h2 class="mb-4">Recibo de Reserva</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Servicio:</strong> {{ recibo.reserva.servicio.nombre }}</p>
+            <p><strong>Fecha:</strong> {{ recibo.fecha_emision|date:"d/m/Y H:i" }}</p>
+            <p><strong>Total:</strong> ${{ recibo.total }}</p>
+        </div>
+    </div>
+    <a href="{% url 'descargar_recibo_pdf' recibo.id %}" class="btn btn-success w-100">Descargar PDF</a>
+</div>
+{% endblock %}

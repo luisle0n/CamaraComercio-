@@ -1,0 +1,8 @@
+{% extends "master.html" %}
+{% block title %}Panel Administrador{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Panel General de Administración</h2>
+    <a href="{% url 'afiliaciones_pendientes' %}" class="btn btn-primary mt-3">Ver afiliaciones pendientes</a>
+</div>
+{% endblock %}

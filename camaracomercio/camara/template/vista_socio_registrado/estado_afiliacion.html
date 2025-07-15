@@ -1,0 +1,19 @@
+{% extends "master.html" %}
+{% block title %}Estado de Afiliación{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <h2 class="mb-4">Estado de tu Afiliación</h2>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Estado:</strong> <span class="badge bg-info">{{ afiliacion.estado }}</span></p>
+            {% if afiliacion.estado == 'aprobada' %}
+            <p class="text-success">¡Tu afiliación ha sido aprobada!</p>
+            {% elif afiliacion.estado == 'pendiente' %}
+            <p class="text-warning">Tu solicitud está pendiente de revisión.</p>
+            {% elif afiliacion.estado == 'rechazada' %}
+            <p class="text-danger">Tu solicitud ha sido rechazada. Por favor, contacta soporte.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

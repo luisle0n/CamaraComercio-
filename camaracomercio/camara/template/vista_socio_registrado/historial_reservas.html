@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+{% block title %}Historial de Reservas{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Historial de Reservas</h2>
+    <ul class="list-group">
+        {% for reserva in reservas %}
+        <li class="list-group-item">
+            {{ reserva.servicio.nombre }} - {{ reserva.fecha_reserva|date:"d/m/Y H:i" }} - <span class="badge bg-info">{{ reserva.estado }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No tienes reservas registradas.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+            <tr>
+                <th>Servicio</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+            <tr>
+                <td>{{ reserva.servicio.nombre }}</td>
+                <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge bg-info">{{ reserva.estado }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No hay reservas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

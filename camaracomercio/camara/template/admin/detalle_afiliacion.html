@@ -1,0 +1,17 @@
+{% extends "master.html" %}
+{% block title %}Detalle Afiliación{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Detalle de Afiliación</h2>
+    <p><strong>Nombre:</strong> {{ afiliacion.nombre_comercial_o_nombres|default:afiliacion.razon_social }}</p>
+    <p><strong>Cédula/RUC:</strong> {{ afiliacion.ruc_o_cedula }}</p>
+    <p><strong>Correo:</strong> {{ afiliacion.correo_electronico }}</p>
+    <p><strong>Estado:</strong> {{ afiliacion.estado }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="action" value="aprobar" class="btn btn-success">Aprobar</button>
+        <button type="submit" name="action" value="rechazar" class="btn btn-danger">Rechazar</button>
+        <a href="{% url 'afiliaciones_pendientes' %}" class="btn btn-secondary">Volver</a>
+    </form>
+</div>
+{% endblock %}

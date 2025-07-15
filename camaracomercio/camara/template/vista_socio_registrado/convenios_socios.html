@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+{% block title %}Convenios para Socios{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Convenios Exclusivos para Socios</h2>
+    <div class="row">
+        {% for empresa_convenio in empresa_convenios %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ empresa_convenio.convenio.nombre }}</h5>
+                    <p class="card-text">{{ empresa_convenio.convenio.descripcion }}</p>
+                    <ul>
+                        {% for beneficio in empresa_convenio.convenio.beneficio_set.all %}
+                        <li>{{ beneficio.descripcion }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No hay convenios exclusivos disponibles.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
