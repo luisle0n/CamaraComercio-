@@ -1,22 +1,66 @@
 {% extends "master.html" %}
 {% block title %}Registro de Usuario{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:600px;">
+<div class="container mt-5" style="max-width:1100px;">
     <h2 class="mb-4 text-center">Registro de Usuario</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-         <div class="mb-3">
+        <div class="mb-3">
             <label for="tipo_usuario" class="form-label">Tipo de Usuario</label>
-            <select class="form-select" id="tipo_usuario" name="tipo_usuario" required onchange="toggleCampos()">
+            <select class="form-select" id="tipo_usuario" name="tipo_usuario" required>
                 <option value="persona" {% if tipo == 'persona' %}selected{% endif %}>Natural</option>
                 <option value="empresa" {% if tipo == 'empresa' %}selected{% endif %}>Juridica</option>
             </select>
         </div>
-        <div  class="form" id="persona-campos" {% if tipo != 'persona' %}style="display:none;"{% endif %}>
-            {{ form.as_p }}
+        <div id="persona-campos" class="campos-expandidos" {% if tipo != 'persona' %}style="display:none;"{% endif %}>
+            <div class="row">
+                {% for field in form %}
+                    {% if field.name == 'red_social_whatsapp' %}
+                        <div class="col-12 mb-2">
+                            <label class="form-label fw-bold">¿Cuáles son las redes sociales que más usas?</label>
+                        </div>
+                    {% endif %}
+                    {% if field.name != 'tipo_persona' %}
+                    <div class="mb-3 col-md-6">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
-        <div id="empresa-campos" {% if tipo != 'empresa' %}style="display:none;"{% endif %}>
-            {{ empresa_form.as_p }}
+        <div id="empresa-campos" class="campos-expandidos" {% if tipo != 'empresa' %}style="display:none;"{% endif %}>
+            <div class="row">
+                {% for field in empresa_form %}
+                    {% if field.name == 'red_social_whatsapp' %}
+                        <div class="col-12 mb-2">
+                            <label class="form-label fw-bold">¿Cuáles son las redes sociales que más usas?</label>
+                        </div>
+                    {% endif %}
+                    {% if field.name != 'tipo_persona' %}
+                    <div class="mb-3 col-md-6">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
         <button type="submit" class="btn btn-success w-100">Registrarse</button>
     </form>

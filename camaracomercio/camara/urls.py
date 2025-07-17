@@ -16,4 +16,8 @@ urlpatterns = [
     path('admin-home/', views.admin_home, name='admin_home'),
     path('afiliaciones-pendientes/', views.afiliaciones_pendientes, name='afiliaciones_pendientes'),
     path('afiliacion/<int:pk>/', views.detalle_afiliacion, name='detalle_afiliacion'),
+    path('admin-convenios/', views.admin_convenios_list, name='admin_convenios_list'),
+    path('admin-convenios/crear/', views.admin_convenio_create, name='admin_convenio_create'),
+    path('admin-convenios/<int:pk>/editar/', views.admin_convenio_edit, name='admin_convenio_edit'),
+    path('admin-convenios/<int:pk>/eliminar/', views.admin_convenio_delete, name='admin_convenio_delete'),
 ]

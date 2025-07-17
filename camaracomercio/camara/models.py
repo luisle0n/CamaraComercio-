@@ -161,8 +161,10 @@ class Servicio(models.Model):
 class Convenio(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
+    imagen = models.ImageField(upload_to='convenios/', null=True, blank=True)
+    fecha_fin = models.DateField(null=True, blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.nombre
 
 

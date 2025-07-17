@@ -14,6 +14,7 @@ class AfiliacionNaturalForm(forms.ModelForm):
         ]
         widgets = {
             'tipo_persona': forms.HiddenInput(),
+            'direccion_principal': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def clean_ruc_o_cedula(self):
@@ -57,6 +58,7 @@ class AfiliacionJuridicaForm(forms.ModelForm):
         ]
         widgets = {
             'tipo_persona': forms.HiddenInput(),
+            'direccion_principal': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def clean_numero(self):

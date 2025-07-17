@@ -492,6 +492,56 @@ h2 {
     margin-bottom: 10px;
 }
 
+/* Campos Expandidos */
+.campos-expandidos {
+    min-height: 70vh !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    padding: 32px 24px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(21,61,108,0.10);
+    margin-bottom: 40px;
+}
+.campos-expandidos .form-label,
+.campos-expandidos label {
+    font-weight: 600;
+    color: #153D6C;
+    margin-bottom: 8px;
+    font-size: 1.08rem;
+}
+.campos-expandidos .form-control,
+.campos-expandidos input,
+.campos-expandidos select,
+.campos-expandidos textarea {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    transition: border-color 0.3s;
+    font-size: 1.05rem;
+    background: #f8f9fa;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+.campos-expandidos .form-control:focus,
+.campos-expandidos input:focus,
+.campos-expandidos select:focus,
+.campos-expandidos textarea:focus {
+    border-color: #0367EC;
+    box-shadow: 0 0 0 0.2rem rgba(3, 103, 236, 0.13);
+    background: #fff;
+}
+.campos-expandidos::-webkit-scrollbar {
+    width: 6px;
+}
+.campos-expandidos::-webkit-scrollbar-thumb {
+    background: #0367EC;
+    border-radius: 3px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-section h1 {

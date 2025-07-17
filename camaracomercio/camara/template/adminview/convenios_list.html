@@ -1,0 +1,57 @@
+{% extends "master.html" %}
+{% block title %}Convenios{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Convenios</h2>
+        <a href="{% url 'admin_convenio_create' %}" class="btn btn-success">Crear Convenio</a>
+    </div>
+    <div class="row">
+        {% for convenio in convenios %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if convenio.imagen %}
+                <img src="{{ convenio.imagen.url }}" class="card-img-top" style="height:180px;object-fit:cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:180px;">
+                    <span class="text-muted">Sin imagen</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-light text-primary">
+                            <i class="fa-solid fa-heart-pulse me-1"></i> Servicios de Salud
+                        </span>
+                        <span class="text-warning"><i class="fa-solid fa-star"></i> Exclusivo</span>
+                    </div>
+                    <h5 class="card-title mb-1">{{ convenio.nombre }}</h5>
+                    <h6 class="card-subtitle mb-2 text-primary">{{ convenio.nombre }}</h6>
+                    <p class="card-text">{{ convenio.descripcion }}</p>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="rounded-pill bg-success bg-opacity-25 px-3 py-1 me-2 d-flex align-items-center" style="font-size:1.1em;">
+                            
+                            <span class="fw-bold text-success">20% DESCUENTO</span>
+                        </div>
+                        {% if convenio.fecha_fin %}
+                        <span class="text-muted" style="font-size:0.95em;">
+                            <i class="fa-regular fa-calendar me-1"></i>
+                            Vigente hasta {{ convenio.fecha_fin|date:"d/m/Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <!-- Puedes agregar aquí más detalles o beneficios si lo deseas -->
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'admin_convenio_edit' convenio.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{% url 'admin_convenio_delete' convenio.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">No hay convenios registrados.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
