@@ -1,0 +1,45 @@
+{% extends "master.html" %}
+{% block title %}Inicio Socio{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Bienvenido, {{ user.first_name|default:user.username }}</h2>
+    {% if user.debe_cambiar_contrasena %}
+        <div class="alert alert-warning text-center">
+            Es tu primer ingreso. Debes cambiar tu contraseña para continuar.
+            <a href="{% url 'cambio_obligatorio_contrasena' %}" class="btn btn-danger btn-sm ms-2">Cambiar contraseña</a>
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card mb-4">
+                <h3>Mis Reservas</h3>
+                <p>Consulta y gestiona tus reservas de servicios.</p>
+                <a href="{% url 'historial_reservas' %}" class="btn btn-primary mt-2">Ver historial</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card mb-4">
+                <h3>Notificaciones</h3>
+                <p>Revisa tus notificaciones y mensajes importantes.</p>
+                <a href="{% url 'notificaciones' %}" class="btn btn-primary mt-2">Ver notificaciones</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card mb-4">
+                <h3>Perfil</h3>
+                <p>Actualiza tus datos personales y de contacto.</p>
+                <a href="{% url 'perfil_usuario' %}" class="btn btn-primary mt-2">Mi perfil</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card mb-4">
+                <h3>Convenios</h3>
+                <p>Accede a los convenios exclusivos para socios.</p>
+                <a href="{% url 'convenios' %}" class="btn btn-primary mt-2">Ver convenios</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

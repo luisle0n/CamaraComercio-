@@ -30,13 +30,48 @@ def get_user_group(user):
     return 'otro'
 
 def home(request):
-    # Redirige según el tipo de usuario
+    # DEBUG: Verifica si la sesión realmente persiste tras login
+    print(f"[HOME] request.user: {request.user}")
+    print(f"[HOME] request.user.is_authenticated: {getattr(request.user, 'is_authenticated', None)}")
+    print(f"[HOME] sessionid: {request.COOKIES.get('sessionid')}")
+    print(f"[HOME] session keys: {list(request.session.keys())}")
+    print(f"[HOME] AUTH_USER_MODEL: {settings.AUTH_USER_MODEL}")
+    print(f"[HOME] user class: {type(request.user)}")
+    print(f"[HOME] _auth_user_id: {request.session.get('_auth_user_id', None)}")
+    print(f"[HOME] _auth_user_backend: {request.session.get('_auth_user_backend', None)}")
+
     if request.user.is_authenticated:
+        # Si es su primer ingreso, fuerza cambio de contraseña
+        if hasattr(request.user, 'debe_cambiar_contrasena') and request.user.debe_cambiar_contrasena:
+            return redirect('cambio_obligatorio_contrasena')
         if request.user.is_superuser or request.user.is_staff:
             return redirect('admin_home')
-        if request.user.groups.filter(name='Socio').exists():
-            return redirect('dashboard')
-        # Puedes agregar lógica para otros grupos si lo necesitas
+        print(f"[HOME] tipo_usuario: {getattr(request.user, 'tipo_usuario', None)} aprobado: {getattr(request.user, 'aprobado', None)} is_active: {getattr(request.user, 'is_active', None)}")
+        print(f"[HOME] grupos: {[g.name for g in request.user.groups.all()]}")
+        if (
+            getattr(request.user, 'tipo_usuario', None) == 'socio'
+            and getattr(request.user, 'aprobado', True)
+            and getattr(request.user, 'is_active', True)
+        ):
+            print("[HOME] Renderizando vista_socio_registrado/home.html por tipo_usuario")
+            reservas = []
+            notificaciones = []
+            return render(request, 'vista_socio_registrado/home.html', {
+                'reservas': reservas,
+                'notificaciones': notificaciones,
+            })
+        elif request.user.groups.filter(name='Socio').exists():
+            print("[HOME] Renderizando vista_socio_registrado/home.html por grupo Socio")
+            reservas = []
+            notificaciones = []
+            return render(request, 'vista_socio_registrado/home.html', {
+                'reservas': reservas,
+                'notificaciones': notificaciones,
+            })
+        else:
+            print("[HOME] Usuario autenticado pero no es socio ni grupo Socio, mostrando home público")
+    else:
+        print("[HOME] Usuario no autenticado, mostrando home público")
     return render(request, 'vista_publica/home.html')
 
 def login_view(request):
@@ -74,7 +109,8 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 print("[LOGIN] Login admin exitoso")
-                request.session.set_expiry(0)  # Sesión expira al cerrar navegador
+                request.session.set_expiry(0)
+                request.session.modified = True
                 return redirect('admin_home')
             else:
                 print("[LOGIN] Credenciales admin inválidas")
@@ -109,26 +145,10 @@ def login_view(request):
                 if user.is_active:
                     auth_login(request, user)
                     print(f"[LOGIN] Login manual exitoso para: {user.username}")
-                    request.session.set_expiry(0)  # Sesión expira al cerrar navegador
-                    # Forzar guardar la sesión antes de redirigir
+                    request.session.set_expiry(0)
                     request.session.modified = True
-                    if getattr(user, 'debe_cambiar_contrasena', False):
-                        print("[LOGIN] Usuario debe cambiar contraseña, redirigiendo a cambio_obligatorio_contrasena")
-                        from django.urls import reverse
-                        return redirect(reverse('cambio_obligatorio_contrasena'))
-                    tipo_usuario = getattr(user, 'tipo_usuario', None)
-                    if tipo_usuario == 'socio':
-                        print("[LOGIN] Usuario es socio")
-                        return redirect('dashboard')
-                    elif tipo_usuario == 'empresa':
-                        print("[LOGIN] Usuario es empresa")
-                        return redirect('dashboard_empresa')
-                    elif tipo_usuario == 'visitante':
-                        print("[LOGIN] Usuario es visitante")
-                        return redirect('home')
-                    else:
-                        print("[LOGIN] Usuario es otro tipo")
-                        return redirect('home')
+                    # Redirige siempre a home, y ahí se verifica si debe cambiar contraseña
+                    return redirect('home')
                 else:
                     print("[LOGIN] Usuario inactivo")
                     messages.error(request, 'La cuenta está inactiva.')

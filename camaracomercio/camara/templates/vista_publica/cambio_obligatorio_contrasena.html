@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+{% block title %}Cambio de Contraseña Obligatorio{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <h2 class="mb-4 text-center">Cambio de Contraseña</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nueva" class="form-label">Nueva contraseña</label>
+            <input type="password" class="form-control" id="nueva" name="nueva" required>
+        </div>
+        <div class="mb-3">
+            <label for="nueva2" class="form-label">Repite la nueva contraseña</label>
+            <input type="password" class="form-control" id="nueva2" name="nueva2" required>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Cambiar contraseña</button>
+    </form>
+    {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
