@@ -85,30 +85,23 @@ def login_view(request):
         identificador_normalizado = identificador.strip().lower()
         print(f"[LOGIN] Identificador normalizado: {identificador_normalizado}")
 
+        # Lógica 1: superuser/staff de camara.Usuario (modelo custom)
         from django.contrib.auth import get_user_model
-        from .models import Usuario as UsuarioCustom
-
         UserModel = get_user_model()
-        is_admin_login = False
-        admin_user = None
-
-        # Busca por username o email en el modelo de Django
         try:
-            admin_user = UserModel.objects.get(username__iexact=identificador_normalizado)
-            is_admin_login = admin_user.is_superuser or admin_user.is_staff
+            user_obj = UserModel.objects.get(username__iexact=identificador_normalizado)
         except UserModel.DoesNotExist:
             try:
-                admin_user = UserModel.objects.get(email__iexact=identificador_normalizado)
-                is_admin_login = admin_user.is_superuser or admin_user.is_staff
+                user_obj = UserModel.objects.get(email__iexact=identificador_normalizado)
             except UserModel.DoesNotExist:
-                admin_user = None
+                user_obj = None
 
-        if is_admin_login and admin_user:
-            print("[LOGIN] Intento de login como admin/superuser/staff")
-            user = authenticate(request, username=admin_user.username, password=contrasena)
+        if user_obj and (user_obj.is_superuser or user_obj.is_staff):
+            print("[LOGIN] Intento de login como superuser/staff (camara.Usuario)")
+            user = authenticate(request, username=user_obj.username, password=contrasena)
             if user is not None:
                 login(request, user)
-                print("[LOGIN] Login admin exitoso")
+                print("[LOGIN] Login superuser/staff exitoso")
                 request.session.set_expiry(0)
                 request.session.modified = True
                 return redirect('admin_home')
@@ -117,51 +110,36 @@ def login_view(request):
                 messages.error(request, 'Credenciales inválidas.')
                 return render(request, 'vista_publica/login.html')
 
-        # Si no es admin, busca en el modelo personalizado
-        print("[LOGIN] Emails registrados en la tabla Usuario:")
-        for u in UsuarioCustom.objects.all():
-            print(f" - {u.email} (username: {u.username})")
+        # Lógica 2: usuario normal de camara.Usuario
+        if not user_obj:
+            # Buscar por email en modelo custom (por si no es superuser/staff)
+            try:
+                user_obj = UserModel.objects.get(email__iexact=identificador_normalizado)
+            except UserModel.DoesNotExist:
+                user_obj = None
 
-        try:
-            user_obj = UsuarioCustom.objects.get(email__iexact=identificador_normalizado)
-            username = user_obj.username
-            print(f"[LOGIN] Usuario encontrado: username={username}, email={user_obj.email}, tipo_usuario={getattr(user_obj, 'tipo_usuario', None)}, aprobado={getattr(user_obj, 'aprobado', None)}, is_active={user_obj.is_active}")
-            print(f"[LOGIN] El nombre de usuario (username) de este usuario es: {username}")
-            if not user_obj.aprobado:
+        if user_obj:
+            print(f"[LOGIN] Usuario encontrado: username={user_obj.username}, email={user_obj.email}, tipo_usuario={getattr(user_obj, 'tipo_usuario', None)}, aprobado={getattr(user_obj, 'aprobado', None)}, is_active={user_obj.is_active}")
+            if not user_obj.aprobado and not user_obj.is_superuser and not user_obj.is_staff:
                 print("[LOGIN] Usuario no aprobado")
                 messages.error(request, 'Tu cuenta aún no ha sido aprobada por el administrador.')
                 return render(request, 'vista_publica/login.html')
-        except UsuarioCustom.DoesNotExist:
-            print("[LOGIN] Usuario no encontrado con ese email")
-            username = None
-
-        if username:
-            print(f"[LOGIN] Autenticando con username: {username} y contraseña: {contrasena}")
-            user_obj.refresh_from_db()
-            if user_obj.check_password(contrasena):
-                print("[LOGIN] check_password OK, autenticando...")
-                from django.contrib.auth import login as auth_login
-                user = user_obj
-                if user.is_active:
-                    auth_login(request, user)
-                    print(f"[LOGIN] Login manual exitoso para: {user.username}")
-                    request.session.set_expiry(0)
-                    request.session.modified = True
-                    # Redirige siempre a home, y ahí se verifica si debe cambiar contraseña
-                    return redirect('home')
+            user = authenticate(request, username=user_obj.username, password=contrasena)
+            if user is not None:
+                login(request, user)
+                print("[LOGIN] Login usuario custom exitoso")
+                request.session.set_expiry(0)
+                request.session.modified = True
+                if user.is_superuser or user.is_staff:
+                    return redirect('admin_home')
                 else:
-                    print("[LOGIN] Usuario inactivo")
-                    messages.error(request, 'La cuenta está inactiva.')
-                    return render(request, 'vista_publica/login.html')
+                    return redirect('home')
             else:
-                print("[LOGIN] check_password FAIL: la contraseña no coincide con el hash en la base de datos")
-                user = None
+                print("[LOGIN] Credenciales inválidas para usuario custom")
+                messages.error(request, 'Credenciales inválidas.')
+                return render(request, 'vista_publica/login.html')
         else:
-            print("[LOGIN] No hay username para autenticar")
-            user = None
-
-        if user is None:
-            print("[LOGIN] Credenciales inválidas")
+            print("[LOGIN] Usuario no encontrado en camara.Usuario")
             messages.error(request, 'Credenciales inválidas.')
     return render(request, 'vista_publica/login.html')
 
