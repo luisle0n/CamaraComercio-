@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
-class Usuario(models.Model):
+class Usuario(AbstractUser):
     TIPO_USUARIO_CHOICES = [
         ('socio', 'Socio'),
         ('visitante', 'Visitante'),
@@ -13,6 +14,30 @@ class Usuario(models.Model):
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20, null=True, blank=True)
     red_social_preferida = models.CharField(max_length=100, null=True, blank=True)
+    aprobado = models.BooleanField(default=False)
+    debe_cambiar_contrasena = models.BooleanField(default=False)
+    fecha_contrasena_temporal = models.DateTimeField(null=True, blank=True)
+
+    # Soluciona el conflicto de related_name
+    groups = models.ManyToManyField(
+        Group,
+        related_name='usuario_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups'
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='usuario_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions'
+    )
+
+    def contrasena_temporal_expirada(self):
+        if self.fecha_contrasena_temporal:
+            return timezone.now() > self.fecha_contrasena_temporal + timezone.timedelta(hours=24)
+        return False
 
     def _str_(self):
         return self.nombre

@@ -20,4 +20,6 @@ urlpatterns = [
     path('admin-convenios/crear/', views.admin_convenio_create, name='admin_convenio_create'),
     path('admin-convenios/<int:pk>/editar/', views.admin_convenio_edit, name='admin_convenio_edit'),
     path('admin-convenios/<int:pk>/eliminar/', views.admin_convenio_delete, name='admin_convenio_delete'),
+    path('aprobar-usuario/<int:user_id>/', views.aprobar_usuario, name='aprobar_usuario'),
+    path('cambio-obligatorio-contrasena/', views.cambio_obligatorio_contrasena, name='cambio_obligatorio_contrasena'),
 ]

@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'camara.middleware.ForzarCambioContrasenaMiddleware',
 ]
 
 ROOT_URLCONF = 'camaracomercio.urls'
@@ -245,9 +246,9 @@ JAZZMIN_SETTINGS = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-ec'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Guayaquil'
 
 USE_I18N = True
 
@@ -266,3 +267,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cambia el backend para envío real de correos:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'loja2002ecuador@gmail.com'
+EMAIL_HOST_PASSWORD = 'cuoulkayyarpsvou'  # Escribe aquí la contraseña de aplicación SIN espacios
+DEFAULT_FROM_EMAIL = 'Cámara de Comercio <loja2002ecuador@gmail.com>'

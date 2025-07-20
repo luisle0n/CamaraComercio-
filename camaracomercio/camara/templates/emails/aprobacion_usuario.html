@@ -1,0 +1,7 @@
+<p>Hola {{ usuario.first_name }},</p>
+<p>Tu cuenta ha sido aprobada. Puedes iniciar sesión con estas credenciales temporales:</p>
+<ul>
+    <li><strong>Usuario:</strong> {{ usuario.username }}</li>
+    <li><strong>Contraseña temporal:</strong> {{ temp_password }}</li>
+</ul>
+<p>Debes cambiar tu contraseña la primera vez que ingreses. Esta contraseña temporal expira en 24 horas.</p>

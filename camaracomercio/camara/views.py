@@ -10,6 +10,12 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import user_passes_test
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth import update_session_auth_hash
+from django.template.loader import render_to_string
+from django.db import IntegrityError
 
 # Create your views here.
 def get_user_group(user):
@@ -215,7 +221,7 @@ def detalle_afiliacion(request, pk):
         action = request.POST.get('action')
 
         if action == 'aprobar':
-            password_plain = secrets.token_urlsafe(8)
+            password_plain = secrets.token_urlsafe(12)
             # Determinar red social preferida por orden de prioridad
             if afiliacion.red_social_whatsapp:
                 red_preferida = 'Whatsapp'
@@ -230,6 +236,11 @@ def detalle_afiliacion(request, pk):
             else:
                 red_preferida = ''
 
+            # Verifica si ya existe un usuario con ese email o cédula
+            if Usuario.objects.filter(email=afiliacion.correo_electronico).exists() or Usuario.objects.filter(cedula=afiliacion.ruc_o_cedula).exists():
+                messages.error(request, "Ya existe un usuario registrado con este correo o cédula.")
+                return redirect('afiliaciones_pendientes')
+
             usuario = Usuario.objects.create(
                 nombre=afiliacion.nombre_comercial_o_nombres,
                 tipo_usuario='socio',
@@ -237,7 +248,14 @@ def detalle_afiliacion(request, pk):
                 email=afiliacion.correo_electronico,
                 telefono='',
                 red_social_preferida=red_preferida,
+                aprobado=True,
+                debe_cambiar_contrasena=True,
+                fecha_contrasena_temporal=timezone.now(),
+                username=afiliacion.ruc_o_cedula
             )
+
+            usuario.set_password(password_plain)
+            usuario.save()
 
             Credencial.objects.create(
                 usuario=usuario,
@@ -248,6 +266,18 @@ def detalle_afiliacion(request, pk):
             afiliacion.estado = 'aprobada'
             afiliacion.fecha_afiliacion = timezone.now()
             afiliacion.save()
+
+            # Enviar correo con credenciales
+            send_mail(
+                'Tu cuenta ha sido aprobada',
+                '',
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.email],
+                html_message=render_to_string('emails/aprobacion_usuario.html', {
+                    'usuario': usuario,
+                    'temp_password': password_plain,
+                })
+            )
 
         elif action == 'rechazar':
             afiliacion.estado = 'rechazada'
@@ -306,3 +336,46 @@ def admin_convenio_delete(request, pk):
         convenio.delete()
         return redirect('admin_convenios_list')
     return render(request, 'adminview/convenio_confirm_delete.html', {'convenio': convenio})
+
+def aprobar_usuario(request, user_id):
+    user = Usuario.objects.get(pk=user_id)
+    if not user.aprobado:
+        temp_password = get_random_string(12)
+        user.set_password(temp_password)
+        user.aprobado = True
+        user.debe_cambiar_contrasena = True
+        user.fecha_contrasena_temporal = timezone.now()
+        user.save()
+        send_mail(
+            'Tu cuenta ha sido aprobada',
+            '',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            html_message=render_to_string('emails/aprobacion_usuario.html', {
+                'usuario': user,
+                'temp_password': temp_password,
+            })
+        )
+    return redirect('afiliaciones_pendientes')
+
+@login_required
+def cambio_obligatorio_contrasena(request):
+    if not request.user.debe_cambiar_contrasena:
+        return redirect('dashboard')
+    if request.user.contrasena_temporal_expirada():
+        logout(request)
+        messages.error(request, 'La contraseña temporal ha expirado. Contacte al administrador.')
+        return redirect('login')
+    if request.method == 'POST':
+        nueva = request.POST.get('nueva')
+        nueva2 = request.POST.get('nueva2')
+        if nueva and nueva == nueva2:
+            request.user.set_password(nueva)
+            request.user.debe_cambiar_contrasena = False
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, 'Contraseña cambiada correctamente.')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Las contraseñas no coinciden.')
+    return render(request, 'vista_publica/cambio_obligatorio_contrasena.html')
