@@ -39,7 +39,7 @@ class Usuario(AbstractUser):
             return timezone.now() > self.fecha_contrasena_temporal + timezone.timedelta(hours=24)
         return False
 
-    def _str_(self):
+    def __str__(self):
         return self.nombre
 
 

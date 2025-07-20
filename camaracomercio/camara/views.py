@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
@@ -12,10 +13,11 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
-from django.conf import settings
 from django.contrib.auth import update_session_auth_hash
 from django.template.loader import render_to_string
 from django.db import IntegrityError
+import logging
+from django.urls import reverse
 
 # Create your views here.
 def get_user_group(user):
@@ -41,16 +43,105 @@ def login_view(request):
     if request.method == 'POST':
         identificador = request.POST.get('identificador')
         contrasena = request.POST.get('contrasena')
-        user = authenticate(request, username=identificador, password=contrasena)
-        if user is not None:
-            login(request, user)
-            if user.is_superuser or user.is_staff:
-                return redirect('admin_home')  # Redirige a tu panel admin personalizado
-            elif user.groups.filter(name='Socio').exists():
-                return redirect('dashboard')
+        user = None
+
+        print(f"[LOGIN] Intento de login con identificador: {identificador}")
+
+        identificador_normalizado = identificador.strip().lower()
+        print(f"[LOGIN] Identificador normalizado: {identificador_normalizado}")
+
+        from django.contrib.auth import get_user_model
+        from .models import Usuario as UsuarioCustom
+
+        UserModel = get_user_model()
+        is_admin_login = False
+        admin_user = None
+
+        # Busca por username o email en el modelo de Django
+        try:
+            admin_user = UserModel.objects.get(username__iexact=identificador_normalizado)
+            is_admin_login = admin_user.is_superuser or admin_user.is_staff
+        except UserModel.DoesNotExist:
+            try:
+                admin_user = UserModel.objects.get(email__iexact=identificador_normalizado)
+                is_admin_login = admin_user.is_superuser or admin_user.is_staff
+            except UserModel.DoesNotExist:
+                admin_user = None
+
+        if is_admin_login and admin_user:
+            print("[LOGIN] Intento de login como admin/superuser/staff")
+            user = authenticate(request, username=admin_user.username, password=contrasena)
+            if user is not None:
+                login(request, user)
+                print("[LOGIN] Login admin exitoso")
+                request.session.set_expiry(0)  # Sesión expira al cerrar navegador
+                return redirect('admin_home')
             else:
-                return redirect('home')
+                print("[LOGIN] Credenciales admin inválidas")
+                messages.error(request, 'Credenciales inválidas.')
+                return render(request, 'vista_publica/login.html')
+
+        # Si no es admin, busca en el modelo personalizado
+        print("[LOGIN] Emails registrados en la tabla Usuario:")
+        for u in UsuarioCustom.objects.all():
+            print(f" - {u.email} (username: {u.username})")
+
+        try:
+            user_obj = UsuarioCustom.objects.get(email__iexact=identificador_normalizado)
+            username = user_obj.username
+            print(f"[LOGIN] Usuario encontrado: username={username}, email={user_obj.email}, tipo_usuario={getattr(user_obj, 'tipo_usuario', None)}, aprobado={getattr(user_obj, 'aprobado', None)}, is_active={user_obj.is_active}")
+            print(f"[LOGIN] El nombre de usuario (username) de este usuario es: {username}")
+            if not user_obj.aprobado:
+                print("[LOGIN] Usuario no aprobado")
+                messages.error(request, 'Tu cuenta aún no ha sido aprobada por el administrador.')
+                return render(request, 'vista_publica/login.html')
+        except UsuarioCustom.DoesNotExist:
+            print("[LOGIN] Usuario no encontrado con ese email")
+            username = None
+
+        if username:
+            print(f"[LOGIN] Autenticando con username: {username} y contraseña: {contrasena}")
+            user_obj.refresh_from_db()
+            if user_obj.check_password(contrasena):
+                print("[LOGIN] check_password OK, autenticando...")
+                from django.contrib.auth import login as auth_login
+                user = user_obj
+                if user.is_active:
+                    auth_login(request, user)
+                    print(f"[LOGIN] Login manual exitoso para: {user.username}")
+                    request.session.set_expiry(0)  # Sesión expira al cerrar navegador
+                    # Forzar guardar la sesión antes de redirigir
+                    request.session.modified = True
+                    if getattr(user, 'debe_cambiar_contrasena', False):
+                        print("[LOGIN] Usuario debe cambiar contraseña, redirigiendo a cambio_obligatorio_contrasena")
+                        from django.urls import reverse
+                        return redirect(reverse('cambio_obligatorio_contrasena'))
+                    tipo_usuario = getattr(user, 'tipo_usuario', None)
+                    if tipo_usuario == 'socio':
+                        print("[LOGIN] Usuario es socio")
+                        return redirect('dashboard')
+                    elif tipo_usuario == 'empresa':
+                        print("[LOGIN] Usuario es empresa")
+                        return redirect('dashboard_empresa')
+                    elif tipo_usuario == 'visitante':
+                        print("[LOGIN] Usuario es visitante")
+                        return redirect('home')
+                    else:
+                        print("[LOGIN] Usuario es otro tipo")
+                        return redirect('home')
+                else:
+                    print("[LOGIN] Usuario inactivo")
+                    messages.error(request, 'La cuenta está inactiva.')
+                    return render(request, 'vista_publica/login.html')
+            else:
+                print("[LOGIN] check_password FAIL: la contraseña no coincide con el hash en la base de datos")
+                user = None
         else:
+            print("[LOGIN] No hay username para autenticar")
+            user = None
+
+        if user is None:
+            print("[LOGIN] Credenciales inválidas")
             messages.error(request, 'Credenciales inválidas.')
     return render(request, 'vista_publica/login.html')
 
@@ -95,46 +186,36 @@ def convenios(request):
     return render(request, 'vista_publica/convenios.html', {'convenios': convenios})
 def faq(request): return render(request, 'vista_publica/faq.html')
 
-@login_required
+# Quitar todos los decoradores @login_required de las vistas protegidas
 def dashboard(request):
     grupo = get_user_group(request.user)
-    if grupo != 'socio':
+    if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    # Solo usuarios normales pueden acceder, no superusuarios ni staff
-    # if request.user.is_superuser or request.user.is_staff:
-    #     return redirect('/admin/')
-    # Puedes personalizar la lógica según tu modelo
-    reservas = []  # Ejemplo: Reserva.objects.filter(usuario=request.user)
-    notificaciones = []  # Ejemplo: Notificacion.objects.filter(usuario=request.user)
+    reservas = []
+    notificaciones = []
     return render(request, 'vista_socio_registrado/dashboard.html', {
         'reservas': reservas,
         'notificaciones': notificaciones,
     })
 
-@login_required
 def perfil_usuario(request):
     grupo = get_user_group(request.user)
-    if grupo != 'socio':
+    if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    # Puedes personalizar la lógica según tu modelo
     return render(request, 'vista_socio_registrado/perfil_usuario.html')
 
-@login_required
 def historial_reservas(request):
     grupo = get_user_group(request.user)
-    if grupo != 'socio':
+    if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    # Puedes personalizar la lógica según tu modelo
-    reservas = []  # Ejemplo: Reserva.objects.filter(usuario=request.user)
+    reservas = []
     return render(request, 'vista_socio_registrado/historial_reservas.html', {'reservas': reservas})
 
-@login_required
 def notificaciones(request):
     grupo = get_user_group(request.user)
-    if grupo != 'socio':
+    if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    # Puedes personalizar la lógica según tu modelo
-    notificaciones = []  # Ejemplo: Notificacion.objects.filter(usuario=request.user)
+    notificaciones = []
     return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
 
 def logout_view(request):
@@ -358,14 +439,33 @@ def aprobar_usuario(request, user_id):
         )
     return redirect('afiliaciones_pendientes')
 
-@login_required
+@login_required(login_url='/login/')
 def cambio_obligatorio_contrasena(request):
-    if not request.user.debe_cambiar_contrasena:
+    # Sin decorador login_required, control manual
+    if not hasattr(request, "user") or not request.user.is_authenticated:
+        print("[CAMBIO CONTRASEÑA] Usuario no autenticado, forzando logout y redirigiendo a login SIN parámetro next")
+        try:
+            logout(request)
+        except Exception as e:
+            print(f"[CAMBIO CONTRASEÑA] Error en logout: {e}")
+        if hasattr(request, "session"):
+            request.session.flush()
+        # Redirige a /login/ sin next, usando HttpResponseRedirect y borrando el parámetro GET
+        from django.http import HttpResponseRedirect
+        response = HttpResponseRedirect('/login/')
+        response.status_code = 302
+        return response
+    if not getattr(request.user, 'debe_cambiar_contrasena', False):
         return redirect('dashboard')
-    if request.user.contrasena_temporal_expirada():
+    if hasattr(request.user, 'contrasena_temporal_expirada') and request.user.contrasena_temporal_expirada():
         logout(request)
+        if hasattr(request, "session"):
+            request.session.flush()
         messages.error(request, 'La contraseña temporal ha expirado. Contacte al administrador.')
-        return redirect('login')
+        from django.http import HttpResponseRedirect
+        response = HttpResponseRedirect('/login/')
+        response.status_code = 302
+        return response
     if request.method == 'POST':
         nueva = request.POST.get('nueva')
         nueva2 = request.POST.get('nueva2')

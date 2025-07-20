@@ -276,3 +276,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'loja2002ecuador@gmail.com'
 EMAIL_HOST_PASSWORD = 'cuoulkayyarpsvou'  # Escribe aquí la contraseña de aplicación SIN espacios
 DEFAULT_FROM_EMAIL = 'Cámara de Comercio <loja2002ecuador@gmail.com>'
+
+LOGIN_URL = '/login/'
