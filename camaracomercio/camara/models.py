@@ -214,16 +214,6 @@ class Beneficio(models.Model):
         return self.descripcion if self.descripcion else "Beneficio sin descripción"
 
 
-class Chatbot(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
-    mensaje_usuario = models.TextField()
-    respuesta_bot = models.TextField()
-    fecha_interaccion = models.DateTimeField()
-
-    def __str__(self):
-        return f"Chatbot {self.usuario} - {self.fecha_interaccion}"
-
-
 class ContactoPrincipal(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
     nombre = models.CharField(max_length=255, null=True, blank=True)

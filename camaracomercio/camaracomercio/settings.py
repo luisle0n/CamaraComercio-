@@ -195,7 +195,6 @@ JAZZMIN_SETTINGS = {
         "camara.AfiliacionJuridica": "fas fa-building",
         "camara.Convenio": "fas fa-handshake",
         "camara.Beneficio": "fas fa-gift",
-        "camara.Chatbot": "fas fa-robot",
         "camara.Credencial": "fas fa-key",
         "camara.Documento": "fas fa-file-alt",
         "camara.Empresa": "fas fa-industry",

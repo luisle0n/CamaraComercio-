@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Usuario, AfiliacionNatural, AfiliacionJuridica, Empresa, Servicio, Convenio, Beneficio,
-    Chatbot, ContactoPrincipal, Credencial, Documento, EmpresaConvenio, Notificacion,
+    ContactoPrincipal, Credencial, Documento, EmpresaConvenio, Notificacion,
     Reserva, Recibo, ServicioProveedor, SolicitudVida
 )
 
@@ -53,12 +53,6 @@ class BeneficioAdmin(admin.ModelAdmin):
     list_display = ('descripcion', 'convenio')
     search_fields = ('descripcion',)
     list_filter = ('convenio',)
-
-@admin.register(Chatbot)
-class ChatbotAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'fecha_interaccion')
-    search_fields = ('usuario__nombre',)
-    list_filter = ('fecha_interaccion',)
 
 @admin.register(ContactoPrincipal)
 class ContactoPrincipalAdmin(admin.ModelAdmin):

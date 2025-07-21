@@ -31,15 +31,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Estadistica',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('descripcion', models.TextField()),
-                ('valor', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('fecha', models.DateTimeField()),
-            ],
-        ),
-        migrations.CreateModel(
             name='Servicio',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -185,16 +176,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-        ),
-        migrations.CreateModel(
-            name='Chatbot',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('mensaje_usuario', models.TextField()),
-                ('respuesta_bot', models.TextField()),
-                ('fecha_interaccion', models.DateTimeField()),
-                ('usuario', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-            ],
         ),
         migrations.CreateModel(
             name='ContactoPrincipal',
