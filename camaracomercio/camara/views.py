@@ -23,6 +23,9 @@ from django.urls import reverse
 def get_user_group(user):
     if user.is_superuser or user.is_staff:
         return 'admin'
+    # Cambia la lógica para socios: revisa tipo_usuario, no solo grupos
+    if getattr(user, 'tipo_usuario', None) == 'socio':
+        return 'socio'
     if user.groups.filter(name='Socio').exists():
         return 'socio'
     if user.groups.filter(name='Visitante').exists():
@@ -204,7 +207,8 @@ def perfil_usuario(request):
 
 def historial_reservas(request):
     grupo = get_user_group(request.user)
-    if not request.user.is_authenticated or grupo != 'socio':
+    # Solo revisa is_authenticated y tipo_usuario, no grupos
+    if not request.user.is_authenticated or getattr(request.user, 'tipo_usuario', None) != 'socio':
         return redirect('home')
     reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
     return render(request, 'vista_socio_registrado/historial_reservas.html', {'reservas': reservas})
@@ -287,13 +291,17 @@ def detalle_afiliacion(request, pk):
     grupo = get_user_group(request.user)
     if grupo != 'admin':
         return redirect('home')
-    # Intentar buscar primero en AfiliacionNatural, luego en AfiliacionJuridica
+    # Buscar primero en AfiliacionJuridica, luego en AfiliacionNatural
+    afiliacion = None
+    tipo_persona = None
     try:
-        afiliacion = AfiliacionNatural.objects.get(pk=pk)
-    except AfiliacionNatural.DoesNotExist:
+        afiliacion = AfiliacionJuridica.objects.get(pk=pk)
+        tipo_persona = 'juridica'
+    except AfiliacionJuridica.DoesNotExist:
         try:
-            afiliacion = AfiliacionJuridica.objects.get(pk=pk)
-        except AfiliacionJuridica.DoesNotExist:
+            afiliacion = AfiliacionNatural.objects.get(pk=pk)
+            tipo_persona = 'natural'
+        except AfiliacionNatural.DoesNotExist:
             raise Http404("Afiliación no encontrada")
 
     if request.method == 'POST':
@@ -330,7 +338,7 @@ def detalle_afiliacion(request, pk):
                 aprobado=True,
                 debe_cambiar_contrasena=True,
                 fecha_contrasena_temporal=timezone.now(),
-                username=afiliacion.ruc_o_cedula
+                username=afiliacion.correo_electronico  # Usar correo como usuario
             )
 
             usuario.set_password(password_plain)
@@ -346,7 +354,7 @@ def detalle_afiliacion(request, pk):
             afiliacion.fecha_afiliacion = timezone.now()
             afiliacion.save()
 
-            # Enviar correo con credenciales
+            # Enviar correo con credenciales (correo como usuario)
             send_mail(
                 'Tu cuenta ha sido aprobada',
                 '',
@@ -354,6 +362,7 @@ def detalle_afiliacion(request, pk):
                 [usuario.email],
                 html_message=render_to_string('emails/aprobacion_usuario.html', {
                     'usuario': usuario,
+                    'correo_login': usuario.email,
                     'temp_password': password_plain,
                 })
             )
@@ -364,7 +373,10 @@ def detalle_afiliacion(request, pk):
 
         return redirect('afiliaciones_pendientes')
 
-    return render(request, 'adminview/detalle_afiliacion.html', {'afiliacion': afiliacion})
+    return render(request, 'adminview/detalle_afiliacion.html', {
+        'afiliacion': afiliacion,
+        'tipo_persona': tipo_persona,
+    })
 
 def admin_required(view_func):
     return user_passes_test(lambda u: u.is_authenticated and (u.is_superuser or u.is_staff), login_url='/login/')(view_func)

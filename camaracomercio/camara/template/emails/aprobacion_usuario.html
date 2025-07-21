@@ -1,7 +1,20 @@
-<p>Hola {{ usuario.first_name }},</p>
-<p>Tu cuenta ha sido aprobada. Puedes iniciar sesión con estas credenciales temporales:</p>
-<ul>
-    <li><strong>Usuario:</strong> {{ usuario.username }}</li>
-    <li><strong>Contraseña temporal:</strong> {{ temp_password }}</li>
-</ul>
-<p>Debes cambiar tu contraseña la primera vez que ingreses. Esta contraseña temporal expira en 24 horas.</p>
+<!-- Este es el template para el correo de aprobación de usuario -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Credenciales de acceso</title>
+</head>
+<body>
+    <h2>¡Bienvenido a la Cámara de Comercio!</h2>
+    <p>Tu cuenta ha sido aprobada. Puedes iniciar sesión en el sistema con las siguientes credenciales:</p>
+    <ul>
+        <li><strong>Usuario (correo):</strong> {{ correo_login }}</li>
+        <li><strong>Contraseña temporal:</strong> {{ temp_password }}</li>
+    </ul>
+    <p>Por seguridad, deberás cambiar tu contraseña en tu primer ingreso.</p>
+    <p>Si tienes dudas, comunícate con el administrador.</p>
+    <br>
+    <p>Atentamente,<br>Equipo Cámara de Comercio</p>
+</body>
+</html>
