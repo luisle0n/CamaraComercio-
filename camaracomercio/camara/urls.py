@@ -30,4 +30,8 @@ urlpatterns = [
     path('servicios/', views.servicios_publicos, name='servicios_publicos'),
     path('servicios/<int:pk>/reservar/', views.reservar_servicio, name='reservar_servicio'),
     path('solicitar-seguro-vida/', views.solicitar_seguro_vida, name='solicitar_seguro_vida'),
+    path('admin-notificacion/', views.admin_notificacion, name='admin_notificacion'),
+    path('admin-convenios/<int:convenio_id>/beneficio/', views.admin_beneficio_create, name='admin_beneficio_create'),
+    path('admin-reservas/', views.admin_reservas_list, name='admin_reservas_list'),
+    path('admin-reservas/<int:pk>/cambiar-estado/', views.admin_reserva_estado, name='admin_reserva_estado'),
 ]

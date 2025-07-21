@@ -18,19 +18,22 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="dashboard-card mb-4">
+            <div class="dashboard-card mb-4 position-relative">
                 <h3>Notificaciones</h3>
                 <p>Revisa tus notificaciones y mensajes importantes.</p>
                 <a href="{% url 'notificaciones' %}" class="btn btn-primary mt-2">Ver notificaciones</a>
+                {% if notificaciones and notificaciones|length > 0 %}
+                    <span style="position:absolute;top:18px;right:18px;width:14px;height:14px;background:#dc3545;border-radius:50%;display:inline-block;border:2px solid #fff;"></span>
+                {% endif %}
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
             <div class="dashboard-card mb-4">
-                <h3>Perfil</h3>
-                <p>Actualiza tus datos personales y de contacto.</p>
-                <a href="{% url 'perfil_usuario' %}" class="btn btn-primary mt-2">Mi perfil</a>
+                <h3>Registro Comercio</h3>
+                <p>Registre su comercio.</p>
+                <a href="{% url 'registro_empresa' %}" class="btn btn-primary mt-2">Registro Comercio</a>
             </div>
         </div>
         <div class="col-md-6">

@@ -1,0 +1,39 @@
+{% extends "master.html" %}
+{% block title %}Reservas{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Todas las Reservas</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Servicio</th>
+                <th>Fecha y Hora</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+            <tr>
+                <td>{{ reserva.usuario.email }}</td>
+                <td>{{ reserva.servicio.nombre }}</td>
+                <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <span class="badge 
+                        {% if reserva.estado == 'pendiente' %}bg-warning
+                        {% elif reserva.estado == 'confirmada' %}bg-success
+                        {% elif reserva.estado == 'cancelada' %}bg-danger
+                        {% endif %}">
+                        {{ reserva.get_estado_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'admin_reserva_estado' reserva.pk %}" class="btn btn-primary btn-sm">Cambiar estado</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -39,6 +39,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin_servicios_list' %}">Gestionar Servicios</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_notificacion' %}">Notificaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_reservas_list' %}">Reservas</a>
+                        </li>
                     {% elif user.is_authenticated and user.is_staff %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin_home' %}">Panel Admin</a>
@@ -48,6 +54,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin_servicios_list' %}">Gestionar Servicios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_notificacion' %}">Notificaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_reservas_list' %}">Reservas</a>
                         </li>
                     {% elif user.is_authenticated and user.tipo_usuario == 'empresa' %}
                         <li class="nav-item">
@@ -61,10 +73,10 @@
                             <a class="nav-link" href="{% url 'home' %}">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'historial_reservas' %}">Mis reservas</a>
+                            <a class="nav-link" href="{% url 'registro_empresa' %}">Registrar Comercio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'perfil_usuario' %}">Mi perfil</a>
+                            <a class="nav-link" href="{% url 'historial_reservas' %}">Mis reservas</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'notificaciones' %}">Notificaciones</a>

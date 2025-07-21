@@ -1,0 +1,29 @@
+{% extends "master.html" %}
+{% block title %}Enviar Notificación{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <h2 class="mb-4">Enviar Notificación a Usuario</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="usuario" class="form-label">Usuario</label>
+            <select class="form-select" id="usuario" name="usuario" required>
+                <option value="">Seleccione un usuario</option>
+                {% for u in usuarios %}
+                    <option value="{{ u.pk }}">{{ u.email }} ({{ u.nombre }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="mensaje" class="form-label">Mensaje</label>
+            <textarea class="form-control" id="mensaje" name="mensaje" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Enviar notificación</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

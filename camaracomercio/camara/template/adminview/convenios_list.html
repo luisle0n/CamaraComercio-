@@ -39,10 +39,26 @@
                         </span>
                         {% endif %}
                     </div>
+                    <!-- Beneficios incluidos -->
+                    {% with beneficios=convenio.beneficio_set.all %}
+                    {% if beneficios %}
+                    <div class="mt-3">
+                        <strong>Beneficios incluidos:</strong>
+                        <ul style="margin-top:8px;">
+                            {% for beneficio in beneficios %}
+                            <li style="color:#28a745;">
+                                {{ beneficio.descripcion }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <a href="{% url 'admin_convenio_edit' convenio.pk %}" class="btn btn-primary btn-sm">Editar</a>
                     <a href="{% url 'admin_convenio_delete' convenio.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a href="{% url 'admin_beneficio_create' convenio.pk %}" class="btn btn-warning btn-sm">Añadir Beneficio</a>
                 </div>
             </div>
         </div>

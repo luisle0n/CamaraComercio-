@@ -58,7 +58,9 @@ def home(request):
         ):
             print("[HOME] Renderizando vista_socio_registrado/home.html por tipo_usuario")
             reservas = []
-            notificaciones = []
+            # Obtiene las notificaciones del usuario
+            from .models import Notificacion
+            notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
             return render(request, 'vista_socio_registrado/home.html', {
                 'reservas': reservas,
                 'notificaciones': notificaciones,
@@ -246,7 +248,8 @@ def notificaciones(request):
     grupo = get_user_group(request.user)
     if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    notificaciones = []
+    from .models import Notificacion
+    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
     return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
 
 def logout_view(request):
@@ -520,6 +523,27 @@ def admin_servicio_delete(request, pk):
         return redirect('admin_servicios_list')
     return render(request, 'adminview/servicio_confirm_delete.html', {'servicio': servicio})
 
+@admin_required
+def admin_reservas_list(request):
+    from .models import Reserva
+    reservas = Reserva.objects.select_related('usuario', 'servicio').order_by('-fecha_reserva')
+    return render(request, 'adminview/reservas_list.html', {'reservas': reservas})
+
+@admin_required
+def admin_reserva_estado(request, pk):
+    from .models import Reserva
+    reserva = Reserva.objects.get(pk=pk)
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+        if nuevo_estado in dict(Reserva.ESTADO_CHOICES):
+            reserva.estado = nuevo_estado
+            reserva.save()
+            messages.success(request, 'Estado de la reserva actualizado.')
+        else:
+            messages.error(request, 'Estado inválido.')
+        return redirect('admin_reservas_list')
+    return render(request, 'adminview/reserva_estado_form.html', {'reserva': reserva})
+
 def aprobar_usuario(request, user_id):
     user = Usuario.objects.get(pk=user_id)
     if not user.aprobado:
@@ -651,3 +675,36 @@ def solicitar_seguro_vida(request):
         messages.success(request, 'Solicitud de seguro de vida enviada correctamente.')
         return redirect('home')
     return render(request, 'vista_socio_registrado/solicitar_seguro_vida.html')
+
+@permission_required('camara.add_notificacion', login_url='/login/')
+def admin_notificacion(request):
+    from .models import Usuario, Notificacion
+    usuarios = Usuario.objects.filter(is_active=True)
+    if request.method == 'POST':
+        usuario_id = request.POST.get('usuario')
+        mensaje = request.POST.get('mensaje')
+        if usuario_id and mensaje:
+            usuario = Usuario.objects.get(pk=usuario_id)
+            Notificacion.objects.create(
+                usuario=usuario,
+                mensaje=mensaje,
+                fecha_envio=timezone.now()
+            )
+            messages.success(request, f'Notificación enviada a {usuario.email}')
+        else:
+            messages.error(request, 'Debes seleccionar un usuario y escribir un mensaje.')
+    return render(request, 'adminview/notificacion.html', {'usuarios': usuarios})
+
+@admin_required
+def admin_beneficio_create(request, convenio_id):
+    from .models import Convenio, Beneficio
+    convenio = Convenio.objects.get(pk=convenio_id)
+    if request.method == 'POST':
+        descripcion = request.POST.get('descripcion')
+        if descripcion:
+            Beneficio.objects.create(convenio=convenio, descripcion=descripcion)
+            messages.success(request, 'Beneficio añadido correctamente.')
+            return redirect('admin_convenios_list')
+        else:
+            messages.error(request, 'Debes ingresar la descripción del beneficio.')
+    return render(request, 'adminview/beneficio_form.html', {'convenio': convenio})

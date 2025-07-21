@@ -30,6 +30,27 @@
                         Vigente hasta {{ convenio.fecha_fin|date:"d/m/Y" }}
                     </div>
                     {% endif %}
+                    {% if convenio.tiene_descuento and convenio.porcentaje_descuento %}
+                    <div class="mb-2">
+                        <span class="badge bg-success" style="font-size:1em;">
+                            {{ convenio.porcentaje_descuento }}% DESCUENTO
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% with beneficios=convenio.beneficio_set.all %}
+                    {% if beneficios %}
+                    <div class="mt-3">
+                        <strong>Beneficios:</strong>
+                        <ul style="margin-top:8px;">
+                            {% for beneficio in beneficios %}
+                            <li style="color:#28a745;">
+                                {{ beneficio.descripcion }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
                 </div>
             </div>
         </div>
