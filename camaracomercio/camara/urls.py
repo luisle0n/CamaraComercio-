@@ -34,4 +34,6 @@ urlpatterns = [
     path('admin-convenios/<int:convenio_id>/beneficio/', views.admin_beneficio_create, name='admin_beneficio_create'),
     path('admin-reservas/', views.admin_reservas_list, name='admin_reservas_list'),
     path('admin-reservas/<int:pk>/cambiar-estado/', views.admin_reserva_estado, name='admin_reserva_estado'),
+    path('reservas/<int:pk>/generar-recibo/', views.generar_recibo, name='generar_recibo'),
+    path('recibo/<int:pk>/', views.ver_recibo, name='ver_recibo'),
 ]

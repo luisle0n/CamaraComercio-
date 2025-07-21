@@ -10,6 +10,7 @@
                 <th>Servicio</th>
                 <th>Fecha y Hora</th>
                 <th>Estado</th>
+                <th>Recibo</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +26,20 @@
                         {% endif %}">
                         {{ reserva.get_estado_display }}
                     </span>
+                </td>
+                <td>
+                    {% if reserva.estado == 'confirmada' %}
+                        {% if reserva.recibo %}
+                            <a href="{% url 'ver_recibo' reserva.recibo.pk %}" class="btn btn-info btn-sm">Ver recibo</a>
+                        {% else %}
+                            <form method="post" action="{% url 'generar_recibo' reserva.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Generar recibo</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">No disponible</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

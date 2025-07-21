@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -420,6 +420,8 @@ def admin_convenios_list(request):
 
 @admin_required
 def admin_convenio_create(request):
+    from .models import Empresa, EmpresaConvenio
+    empresas = Empresa.objects.all()
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         descripcion = request.POST.get('descripcion')
@@ -428,6 +430,7 @@ def admin_convenio_create(request):
         categoria = request.POST.get('categoria')
         tiene_descuento = request.POST.get('tiene_descuento') == 'si'
         porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
+        empresa_id = request.POST.get('empresa')
         convenio = Convenio(
             nombre=nombre,
             descripcion=descripcion,
@@ -440,12 +443,20 @@ def admin_convenio_create(request):
         if imagen:
             convenio.imagen = imagen
         convenio.save()
+        # Relaciona el convenio con la empresa seleccionada
+        if empresa_id:
+            empresa = Empresa.objects.get(pk=empresa_id)
+            EmpresaConvenio.objects.create(empresa=empresa, convenio=convenio)
         return redirect('admin_convenios_list')
-    return render(request, 'adminview/convenio_form.html', {'accion': 'Crear'})
+    return render(request, 'adminview/convenio_form.html', {'accion': 'Crear', 'empresas': empresas})
 
 @admin_required
 def admin_convenio_edit(request, pk):
+    from .models import Empresa, EmpresaConvenio
     convenio = Convenio.objects.get(pk=pk)
+    empresas = Empresa.objects.all()
+    empresa_convenio = EmpresaConvenio.objects.filter(convenio=convenio).first()
+    empresa_id_actual = empresa_convenio.empresa.pk if empresa_convenio and empresa_convenio.empresa else None
     if request.method == 'POST':
         convenio.nombre = request.POST.get('nombre')
         convenio.descripcion = request.POST.get('descripcion')
@@ -454,6 +465,7 @@ def admin_convenio_edit(request, pk):
         categoria = request.POST.get('categoria')
         tiene_descuento = request.POST.get('tiene_descuento') == 'si'
         porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
+        empresa_id = request.POST.get('empresa')
         if fecha_fin:
             convenio.fecha_fin = fecha_fin
         else:
@@ -465,8 +477,21 @@ def admin_convenio_edit(request, pk):
         convenio.tiene_descuento = tiene_descuento
         convenio.porcentaje_descuento = porcentaje_descuento if tiene_descuento and porcentaje_descuento else None
         convenio.save()
+        # Actualiza la relación empresa-convenio
+        if empresa_id:
+            empresa = Empresa.objects.get(pk=empresa_id)
+            ec, created = EmpresaConvenio.objects.get_or_create(convenio=convenio)
+            ec.empresa = empresa
+            ec.save()
+        else:
+            EmpresaConvenio.objects.filter(convenio=convenio).delete()
         return redirect('admin_convenios_list')
-    return render(request, 'adminview/convenio_form.html', {'convenio': convenio, 'accion': 'Editar'})
+    return render(request, 'adminview/convenio_form.html', {
+        'convenio': convenio,
+        'accion': 'Editar',
+        'empresas': empresas,
+        'empresa_id_actual': empresa_id_actual
+    })
 
 @admin_required
 def admin_convenio_delete(request, pk):
@@ -708,3 +733,29 @@ def admin_beneficio_create(request, convenio_id):
         else:
             messages.error(request, 'Debes ingresar la descripción del beneficio.')
     return render(request, 'adminview/beneficio_form.html', {'convenio': convenio})
+
+@login_required(login_url='/login/')
+def generar_recibo(request, pk):
+    reserva = Reserva.objects.get(pk=pk)
+    if reserva.usuario != request.user or reserva.estado != 'confirmada':
+        messages.error(request, 'No tienes permiso para generar el recibo.')
+        return redirect('historial_reservas')
+    if hasattr(reserva, 'recibo'):
+        messages.info(request, 'Ya existe un recibo para esta reserva.')
+        return redirect('historial_reservas')
+    # Genera el recibo
+    recibo = Recibo.objects.create(
+        reserva=reserva,
+        fecha_emision=timezone.now(),
+        total=reserva.servicio.precio or 0
+    )
+    messages.success(request, 'Recibo generado correctamente.')
+    return redirect('historial_reservas')
+
+@login_required(login_url='/login/')
+def ver_recibo(request, pk):
+    recibo = Recibo.objects.get(pk=pk)
+    if recibo.reserva.usuario != request.user:
+        messages.error(request, 'No tienes permiso para ver este recibo.')
+        return redirect('historial_reservas')
+    return render(request, 'vista_socio_registrado/recibo.html', {'recibo': recibo})

@@ -301,7 +301,7 @@ class Reserva(models.Model):
 
 
 class Recibo(models.Model):
-    reserva = models.ForeignKey(Reserva, on_delete=models.SET_NULL, null=True)
+    reserva = models.OneToOneField('Reserva', on_delete=models.SET_NULL, null=True, related_name='recibo')
     fecha_emision = models.DateTimeField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
 

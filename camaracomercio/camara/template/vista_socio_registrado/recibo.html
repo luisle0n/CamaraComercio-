@@ -1,0 +1,21 @@
+{% extends "master.html" %}
+{% block title %}Recibo{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Recibo de Reserva</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Servicio:</strong> {{ recibo.reserva.servicio.nombre }}</p>
+            <p><strong>Usuario:</strong> {{ recibo.reserva.usuario.nombre }}</p>
+            <p><strong>Fecha de reserva:</strong> {{ recibo.reserva.fecha_reserva|date:"d/m/Y H:i" }}</p>
+            <p><strong>Fecha de emisión:</strong> {{ recibo.fecha_emision|date:"d/m/Y H:i" }}</p>
+            <p><strong>Total:</strong> ${{ recibo.total }}</p>
+            <hr>
+            <p class="text-muted">Este recibo ha sido generado automáticamente por la Cámara de Comercio de Loja.</p>
+        </div>
+    </div>
+    <a href="{% url 'historial_reservas' %}" class="btn btn-secondary mt-3 w-100">Volver</a>
+</div>
+{% endblock %}
