@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -603,3 +603,51 @@ def reservar_servicio(request, pk):
     return render(request, 'vista_socio_registrado/reservar_servicio.html', {
         'servicio': servicio,
     })
+
+from .models import SolicitudVida
+
+@login_required(login_url='/login/')
+def solicitar_seguro_vida(request):
+    if request.method == 'POST':
+        # Recoge los campos del modelo SolicitudVida
+        estado_civil = request.POST.get('estado_civil')
+        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+        direccion = request.POST.get('direccion')
+        correo = request.POST.get('correo')
+        telefono = request.POST.get('telefono')
+        ocupacion = request.POST.get('ocupacion')
+        es_empleado = request.POST.get('es_empleado') == 'on'
+        otros_seguros = request.POST.get('otros_seguros')
+        peso = request.POST.get('peso')
+        estatura = request.POST.get('estatura')
+        tension_arterial = request.POST.get('tension_arterial')
+        consume_alcohol = request.POST.get('consume_alcohol') == 'on'
+        fuma = request.POST.get('fuma') == 'on'
+        usa_drogas = request.POST.get('usa_drogas') == 'on'
+        deportes = request.POST.get('deportes')
+        beneficiarios = request.POST.get('beneficiarios')
+        detalles_salud = request.POST.get('detalles_salud')
+
+        SolicitudVida.objects.create(
+            usuario=request.user,
+            estado_civil=estado_civil,
+            fecha_nacimiento=fecha_nacimiento,
+            direccion=direccion,
+            correo=correo,
+            telefono=telefono,
+            ocupacion=ocupacion,
+            es_empleado=es_empleado,
+            otros_seguros=otros_seguros,
+            peso=peso,
+            estatura=estatura,
+            tension_arterial=tension_arterial,
+            consume_alcohol=consume_alcohol,
+            fuma=fuma,
+            usa_drogas=usa_drogas,
+            deportes=deportes,
+            beneficiarios=beneficiarios,
+            detalles_salud=detalles_salud,
+        )
+        messages.success(request, 'Solicitud de seguro de vida enviada correctamente.')
+        return redirect('home')
+    return render(request, 'vista_socio_registrado/solicitar_seguro_vida.html')

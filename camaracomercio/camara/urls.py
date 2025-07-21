@@ -29,4 +29,5 @@ urlpatterns = [
     path('admin-servicios/<int:pk>/eliminar/', views.admin_servicio_delete, name='admin_servicio_delete'),
     path('servicios/', views.servicios_publicos, name='servicios_publicos'),
     path('servicios/<int:pk>/reservar/', views.reservar_servicio, name='reservar_servicio'),
+    path('solicitar-seguro-vida/', views.solicitar_seguro_vida, name='solicitar_seguro_vida'),
 ]
