@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -63,6 +63,9 @@ def home(request):
                 'reservas': reservas,
                 'notificaciones': notificaciones,
             })
+        elif getattr(request.user, 'tipo_usuario', None) == 'empresa':
+            print("[HOME] Renderizando vista_empresa/home.html por tipo_usuario empresa")
+            return render(request, 'vista_empresa/home.html')
         elif request.user.groups.filter(name='Socio').exists():
             print("[HOME] Renderizando vista_socio_registrado/home.html por grupo Socio")
             reservas = []
@@ -180,6 +183,32 @@ def registro(request):
         'empresa_form': empresa_form,
         'tipo': tipo
     })
+
+def registro_empresa(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        direccion = request.POST.get('direccion')
+        telefono = request.POST.get('telefono')
+        tipo_negocio = request.POST.get('tipo_negocio')
+        ruc = request.POST.get('ruc')
+        representante = request.user  # El usuario autenticado
+
+        # Validación básica
+        if nombre and ruc:
+            Empresa.objects.create(
+                nombre=nombre,
+                direccion=direccion,
+                telefono=telefono,
+                tipo_negocio=tipo_negocio,
+                ruc=ruc,
+                representante=representante
+            )
+            messages.success(request, 'Empresa registrada correctamente.')
+            return redirect('home')
+        else:
+            messages.error(request, 'Debes completar los campos obligatorios.')
+
+    return render(request, 'vista_empresa/registroEmpresa.html')
 
 def afiliacion(request): return render(request, 'vista_publica/afiliacion.html')
 def convenios(request):

@@ -1,0 +1,18 @@
+{% extends "master.html" %}
+{% block title %}Inicio Empresa{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Bienvenido al portal de empresas</h2>
+    <div class="card p-4">
+        <p>Desde aquí puedes gestionar la información de tu empresa, acceder a servicios y registrar nuevos datos.</p>
+        <ul>
+            <li>Accede a tu perfil de empresa.</li>
+            <li>
+                <a class="nav-link" href="{% url 'registro' %}">Registro de empresa</a>
+            </li>
+            <li>Consulta servicios y convenios disponibles.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

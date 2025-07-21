@@ -29,17 +29,63 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'convenios' %}">Convenios</a>
-                    </li>
-                    <!-- Elimina la opción Dashboard -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'servicios_publicos' %}">Servicios</a>
-                    </li>
-                    <!-- ...otras opciones... -->
+                    {% if user.is_authenticated and user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_home' %}">Panel Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_convenios_list' %}">Gestionar Convenios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_servicios_list' %}">Gestionar Servicios</a>
+                        </li>
+                    {% elif user.is_authenticated and user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_home' %}">Panel Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_convenios_list' %}">Gestionar Convenios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_servicios_list' %}">Gestionar Servicios</a>
+                        </li>
+                    {% elif user.is_authenticated and user.tipo_usuario == 'empresa' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'registro_empresa' %}">Registro de empresa</a>
+                        </li>
+                    {% elif user.is_authenticated and user.tipo_usuario == 'socio' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'historial_reservas' %}">Mis reservas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'perfil_usuario' %}">Mi perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notificaciones' %}">Notificaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'convenios' %}">Convenios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'servicios_publicos' %}">Servicios</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'convenios' %}">Convenios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'servicios_publicos' %}">Servicios</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 
                 <ul class="navbar-nav">
