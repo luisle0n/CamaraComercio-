@@ -22,4 +22,10 @@ urlpatterns = [
     path('admin-convenios/<int:pk>/eliminar/', views.admin_convenio_delete, name='admin_convenio_delete'),
     path('aprobar-usuario/<int:user_id>/', views.aprobar_usuario, name='aprobar_usuario'),
     path('cambio-obligatorio-contrasena/', views.cambio_obligatorio_contrasena, name='cambio_obligatorio_contrasena'),
+    path('admin-servicios/', views.admin_servicios_list, name='admin_servicios_list'),
+    path('admin-servicios/crear/', views.admin_servicio_create, name='admin_servicio_create'),
+    path('admin-servicios/<int:pk>/editar/', views.admin_servicio_edit, name='admin_servicio_edit'),
+    path('admin-servicios/<int:pk>/eliminar/', views.admin_servicio_delete, name='admin_servicio_delete'),
+    path('servicios/', views.servicios_publicos, name='servicios_publicos'),
+    path('servicios/<int:pk>/reservar/', views.reservar_servicio, name='reservar_servicio'),
 ]

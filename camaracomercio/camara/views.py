@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -206,7 +206,7 @@ def historial_reservas(request):
     grupo = get_user_group(request.user)
     if not request.user.is_authenticated or grupo != 'socio':
         return redirect('home')
-    reservas = []
+    reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
     return render(request, 'vista_socio_registrado/historial_reservas.html', {'reservas': reservas})
 
 def notificaciones(request):
@@ -381,7 +381,16 @@ def admin_convenio_create(request):
         descripcion = request.POST.get('descripcion')
         fecha_fin = request.POST.get('fecha_fin')
         imagen = request.FILES.get('imagen')
-        convenio = Convenio(nombre=nombre, descripcion=descripcion)
+        categoria = request.POST.get('categoria')
+        tiene_descuento = request.POST.get('tiene_descuento') == 'si'
+        porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
+        convenio = Convenio(
+            nombre=nombre,
+            descripcion=descripcion,
+            categoria=categoria,
+            tiene_descuento=tiene_descuento,
+            porcentaje_descuento=porcentaje_descuento if tiene_descuento and porcentaje_descuento else None
+        )
         if fecha_fin:
             convenio.fecha_fin = fecha_fin
         if imagen:
@@ -398,12 +407,19 @@ def admin_convenio_edit(request, pk):
         convenio.descripcion = request.POST.get('descripcion')
         fecha_fin = request.POST.get('fecha_fin')
         imagen = request.FILES.get('imagen')
+        categoria = request.POST.get('categoria')
+        tiene_descuento = request.POST.get('tiene_descuento') == 'si'
+        porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
         if fecha_fin:
             convenio.fecha_fin = fecha_fin
         else:
             convenio.fecha_fin = None
         if imagen:
             convenio.imagen = imagen
+        if categoria:
+            convenio.categoria = categoria
+        convenio.tiene_descuento = tiene_descuento
+        convenio.porcentaje_descuento = porcentaje_descuento if tiene_descuento and porcentaje_descuento else None
         convenio.save()
         return redirect('admin_convenios_list')
     return render(request, 'adminview/convenio_form.html', {'convenio': convenio, 'accion': 'Editar'})
@@ -415,6 +431,53 @@ def admin_convenio_delete(request, pk):
         convenio.delete()
         return redirect('admin_convenios_list')
     return render(request, 'adminview/convenio_confirm_delete.html', {'convenio': convenio})
+
+@admin_required
+def admin_servicios_list(request):
+    servicios = Servicio.objects.all()
+    return render(request, 'adminview/servicios_list.html', {'servicios': servicios})
+
+@admin_required
+def admin_servicio_create(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        descripcion = request.POST.get('descripcion')
+        precio = request.POST.get('precio')
+        imagen = request.FILES.get('imagen')
+        servicio = Servicio(nombre=nombre, descripcion=descripcion)
+        if precio:
+            servicio.precio = precio
+        if imagen:
+            servicio.imagen = imagen
+        servicio.save()
+        return redirect('admin_servicios_list')
+    return render(request, 'adminview/servicio_form.html', {'accion': 'Crear'})
+
+@admin_required
+def admin_servicio_edit(request, pk):
+    servicio = Servicio.objects.get(pk=pk)
+    if request.method == 'POST':
+        servicio.nombre = request.POST.get('nombre')
+        servicio.descripcion = request.POST.get('descripcion')
+        precio = request.POST.get('precio')
+        imagen = request.FILES.get('imagen')
+        if precio:
+            servicio.precio = precio
+        else:
+            servicio.precio = None
+        if imagen:
+            servicio.imagen = imagen
+        servicio.save()
+        return redirect('admin_servicios_list')
+    return render(request, 'adminview/servicio_form.html', {'servicio': servicio, 'accion': 'Editar'})
+
+@admin_required
+def admin_servicio_delete(request, pk):
+    servicio = Servicio.objects.get(pk=pk)
+    if request.method == 'POST':
+        servicio.delete()
+        return redirect('admin_servicios_list')
+    return render(request, 'adminview/servicio_confirm_delete.html', {'servicio': servicio})
 
 def aprobar_usuario(request, user_id):
     user = Usuario.objects.get(pk=user_id)
@@ -477,3 +540,25 @@ def cambio_obligatorio_contrasena(request):
         else:
             messages.error(request, 'Las contraseñas no coinciden.')
     return render(request, 'vista_publica/cambio_obligatorio_contrasena.html')
+
+def servicios_publicos(request):
+    servicios = Servicio.objects.all()
+    return render(request, 'vista_socio_registrado/servicios_list.html', {'servicios': servicios})
+
+@login_required(login_url='/login/')
+def reservar_servicio(request, pk):
+    servicio = Servicio.objects.get(pk=pk)
+    if request.method == 'POST':
+        # Procesa la reserva y muestra mensaje
+        Reserva.objects.create(
+            usuario=request.user,
+            servicio=servicio,
+            fecha_reserva=timezone.now(),
+            estado='pendiente'
+        )
+        messages.success(request, f'Reserva realizada para el servicio: {servicio.nombre}')
+        return redirect('servicios_publicos')
+    # Si es GET, muestra el formulario de reserva
+    return render(request, 'vista_socio_registrado/reservar_servicio.html', {
+        'servicio': servicio,
+    })

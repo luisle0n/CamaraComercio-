@@ -174,20 +174,33 @@ class Empresa(models.Model):
 
 
 class Servicio(models.Model):
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='servicios')
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # Nuevo campo imagen
 
     def _str_(self):
-        return f"{self.nombre} - {self.empresa.nombre}"
+        return self.nombre
 
 
 class Convenio(models.Model):
+    CATEGORIA_CHOICES = [
+        ('financieros', 'Servicios Financieros'),
+        ('turismo', 'Turismo y Hotelería'),
+        ('profesionales', 'Servicios Profesionales'),
+        ('graficos', 'Servicios Gráficos'),
+    ]
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
     imagen = models.ImageField(upload_to='convenios/', null=True, blank=True)
     fecha_fin = models.DateField(null=True, blank=True)
+    categoria = models.CharField(
+        max_length=20,
+        choices=CATEGORIA_CHOICES,
+        default='financieros'
+    )
+    tiene_descuento = models.BooleanField(default=False)  # Nuevo campo
+    porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Nuevo campo
 
     def __str__(self):
         return self.nombre
@@ -258,6 +271,7 @@ class Servicio(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # Nuevo campo imagen
 
     def _str_(self):
         return self.nombre

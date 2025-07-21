@@ -2,16 +2,12 @@
 {% block title %}Reservar Servicio{% endblock %}
 {% block content %}
 <div class="container mt-5" style="max-width:500px;">
-    <h2 class="mb-4">Reservar un Servicio</h2>
+    <h2 class="mb-4">Reservar Servicio</h2>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-            <label for="servicio" class="form-label">Servicio</label>
-            <select class="form-select" id="servicio" name="servicio" required>
-                {% for servicio in servicios %}
-                <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label">Servicio</label>
+            <input type="text" class="form-control" value="{{ servicio.nombre }}" readonly>
         </div>
         <div class="mb-3">
             <label for="fecha_reserva" class="form-label">Fecha y Hora</label>
@@ -21,3 +17,4 @@
     </form>
 </div>
 {% endblock %}
+

@@ -1,0 +1,42 @@
+{% extends "master.html" %}
+{% block title %}Servicios{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Servicios</h2>
+        <a href="{% url 'admin_servicio_create' %}" class="btn btn-success">Crear Servicio</a>
+    </div>
+    <div class="row">
+        {% for servicio in servicios %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if servicio.imagen %}
+                <img src="{{ servicio.imagen.url }}" class="card-img-top" style="height:180px;object-fit:cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:180px;">
+                    <span class="text-muted">Sin imagen</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title mb-1">{{ servicio.nombre }}</h5>
+                    <p class="card-text">{{ servicio.descripcion }}</p>
+                    {% if servicio.precio %}
+                    <div class="mb-2">
+                        <span class="badge bg-success">Precio: ${{ servicio.precio }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'admin_servicio_edit' servicio.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{% url 'admin_servicio_delete' servicio.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">No hay servicios registrados.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

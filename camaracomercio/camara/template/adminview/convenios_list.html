@@ -20,18 +20,18 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="badge bg-light text-primary">
-                            <i class="fa-solid fa-heart-pulse me-1"></i> Servicios de Salud
+                            {{ convenio.get_categoria_display }}
                         </span>
-                        <span class="text-warning"><i class="fa-solid fa-star"></i> Exclusivo</span>
+                        {% if convenio.tiene_descuento and convenio.porcentaje_descuento %}
+                        <span class="badge bg-success">{{ convenio.porcentaje_descuento }}% DESCUENTO</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Sin descuento</span>
+                        {% endif %}
                     </div>
                     <h5 class="card-title mb-1">{{ convenio.nombre }}</h5>
                     <h6 class="card-subtitle mb-2 text-primary">{{ convenio.nombre }}</h6>
                     <p class="card-text">{{ convenio.descripcion }}</p>
                     <div class="d-flex align-items-center mb-2">
-                        <div class="rounded-pill bg-success bg-opacity-25 px-3 py-1 me-2 d-flex align-items-center" style="font-size:1.1em;">
-                            
-                            <span class="fw-bold text-success">20% DESCUENTO</span>
-                        </div>
                         {% if convenio.fecha_fin %}
                         <span class="text-muted" style="font-size:0.95em;">
                             <i class="fa-regular fa-calendar me-1"></i>
@@ -39,7 +39,6 @@
                         </span>
                         {% endif %}
                     </div>
-                    <!-- Puedes agregar aquí más detalles o beneficios si lo deseas -->
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <a href="{% url 'admin_convenio_edit' convenio.pk %}" class="btn btn-primary btn-sm">Editar</a>
@@ -55,3 +54,4 @@
     </div>
 </div>
 {% endblock %}
+
