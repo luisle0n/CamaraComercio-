@@ -3,10 +3,10 @@ from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Documento
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -164,18 +164,34 @@ def registro(request):
         if tipo == 'persona':
             post_data = request.POST.copy()
             post_data['tipo_persona'] = 'natural'
-            form = AfiliacionNaturalForm(post_data, request.FILES)
+            comprobante = request.FILES.get('comprobante_pago')
+            form = AfiliacionNaturalForm(post_data)
             empresa_form = AfiliacionJuridicaForm()
             if form.is_valid():
-                form.save()
+                afiliacion = form.save(commit=False)
+                afiliacion.save()
+                if comprobante:
+                    Documento.objects.create(
+                        afiliacion_natural=afiliacion,
+                        nombre_archivo=comprobante.name,
+                        contenido=comprobante.read()
+                    )
                 return redirect('home')
         else:
             post_data = request.POST.copy()
             post_data['tipo_persona'] = 'juridica'
-            empresa_form = AfiliacionJuridicaForm(post_data, request.FILES)
+            comprobante = request.FILES.get('comprobante_pago')
+            empresa_form = AfiliacionJuridicaForm(post_data)
             form = AfiliacionNaturalForm()
             if empresa_form.is_valid():
-                empresa_form.save()
+                afiliacion = empresa_form.save(commit=False)
+                afiliacion.save()
+                if comprobante:
+                    Documento.objects.create(
+                        afiliacion_juridica=afiliacion,
+                        nombre_archivo=comprobante.name,
+                        contenido=comprobante.read()
+                    )
                 return redirect('home')
     else:
         form = AfiliacionNaturalForm()
@@ -326,13 +342,17 @@ def detalle_afiliacion(request, pk):
     # Buscar primero en AfiliacionJuridica, luego en AfiliacionNatural
     afiliacion = None
     tipo_persona = None
+    documento = None
+    from .models import Documento
     try:
         afiliacion = AfiliacionJuridica.objects.get(pk=pk)
         tipo_persona = 'juridica'
+        documento = Documento.objects.filter(afiliacion_juridica=afiliacion).first()
     except AfiliacionJuridica.DoesNotExist:
         try:
             afiliacion = AfiliacionNatural.objects.get(pk=pk)
             tipo_persona = 'natural'
+            documento = Documento.objects.filter(afiliacion_natural=afiliacion).first()
         except AfiliacionNatural.DoesNotExist:
             raise Http404("Afiliación no encontrada")
 
@@ -408,6 +428,7 @@ def detalle_afiliacion(request, pk):
     return render(request, 'adminview/detalle_afiliacion.html', {
         'afiliacion': afiliacion,
         'tipo_persona': tipo_persona,
+        'documento': documento,
     })
 
 def admin_required(view_func):
@@ -708,3 +729,10 @@ def admin_beneficio_create(request, convenio_id):
         else:
             messages.error(request, 'Debes ingresar la descripción del beneficio.')
     return render(request, 'adminview/beneficio_form.html', {'convenio': convenio})
+
+def descargar_documento(request, pk):
+    from .models import Documento
+    doc = get_object_or_404(Documento, pk=pk)
+    response = HttpResponse(doc.contenido, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{doc.nombre_archivo}"'
+    return response

@@ -40,7 +40,7 @@ class Usuario(AbstractUser):
         return False
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} ({self.email})"
 
 
 class Afiliacion(models.Model):
@@ -73,8 +73,8 @@ class Afiliacion(models.Model):
     class Meta:
         abstract = True
 
-    def _str_(self):
-        return f"{self.correo_electronico} - {self.estado}"
+    def __str__(self):
+        return f"{self.correo_electronico} - {self.get_tipo_persona_display()} - {self.get_estado_display()}"
 
     @classmethod
     def total_aprobadas(cls):
@@ -98,8 +98,8 @@ class AfiliacionNatural(Afiliacion):
     pais = models.CharField(max_length=255, null=True, blank=True)
     pagina_web = models.URLField(null=True, blank=True)
 
-    def _str_(self):
-        return f"Natural: {self.nombre_comercial_o_nombres} - {self.estado}"
+    def __str__(self):
+        return f"{self.nombre_comercial_o_nombres[:20]} - {self.ruc_o_cedula} - {self.get_estado_display()}"
 
 
 class AfiliacionJuridica(Afiliacion):
@@ -157,8 +157,8 @@ class AfiliacionJuridica(Afiliacion):
 
     firma = models.TextField(null=True, blank=True)
 
-    def _str_(self):
-        return f"Jurídica: {self.razon_social} - {self.estado}"
+    def __str__(self):
+        return f"{self.razon_social[:20]} - {self.ruc_o_cedula} - {self.get_estado_display()}"
 
 
 class Empresa(models.Model):
@@ -169,8 +169,8 @@ class Empresa(models.Model):
     tipo_negocio = models.CharField(max_length=100, null=True, blank=True)
     ruc = models.CharField(max_length=20, unique=True)
 
-    def _str_(self):
-        return self.nombre
+    def __str__(self):
+        return f"{self.nombre} ({self.ruc})"
 
 
 class Servicio(models.Model):
@@ -179,8 +179,8 @@ class Servicio(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # Nuevo campo imagen
 
-    def _str_(self):
-        return self.nombre
+    def __str__(self):
+        return f"{self.nombre} (${self.precio})"
 
 
 class Convenio(models.Model):
@@ -203,12 +203,15 @@ class Convenio(models.Model):
     porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Nuevo campo
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} ({self.get_categoria_display()})"
 
 
 class Beneficio(models.Model):
     convenio = models.ForeignKey(Convenio, on_delete=models.SET_NULL, null=True)
     descripcion = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.descripcion if self.descripcion else "Beneficio sin descripción"
 
 
 class Chatbot(models.Model):
@@ -217,6 +220,9 @@ class Chatbot(models.Model):
     respuesta_bot = models.TextField()
     fecha_interaccion = models.DateTimeField()
 
+    def __str__(self):
+        return f"Chatbot {self.usuario} - {self.fecha_interaccion}"
+
 
 class ContactoPrincipal(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
@@ -224,18 +230,40 @@ class ContactoPrincipal(models.Model):
     telefono = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.nombre} ({self.email})"
+
 
 class Credencial(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
     hash_contrasena = models.TextField()
     ultimo_inicio_sesion = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return f"Credencial de {self.usuario}"
+
 
 class Documento(models.Model):
     afiliacion_natural = models.ForeignKey('AfiliacionNatural', on_delete=models.SET_NULL, null=True, blank=True)
     afiliacion_juridica = models.ForeignKey('AfiliacionJuridica', on_delete=models.SET_NULL, null=True, blank=True)
     nombre_archivo = models.CharField(max_length=255)
-    contenido = models.BinaryField(null=True, blank=True)
+    archivo = models.FileField(upload_to='documentos/', null=True, blank=True)  # Cambiado a FileField
+
+    def __str__(self):
+        return f"{self.nombre_archivo}"
+
+    def save_comprobante_afiliacion(self, afiliacion):
+        """
+        Guarda el comprobante de pago de una afiliación en este documento.
+        """
+        if hasattr(afiliacion, 'comprobante_pago') and afiliacion.comprobante_pago:
+            self.nombre_archivo = afiliacion.comprobante_pago.name
+            self.archivo = afiliacion.comprobante_pago
+            if isinstance(afiliacion, AfiliacionNatural):
+                self.afiliacion_natural = afiliacion
+            elif isinstance(afiliacion, AfiliacionJuridica):
+                self.afiliacion_juridica = afiliacion
+            self.save()
 
 
 class Empresa(models.Model):
@@ -246,7 +274,7 @@ class Empresa(models.Model):
     ruc = models.CharField(max_length=20, unique=True)
     representante = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.nombre
 
 
@@ -254,11 +282,8 @@ class EmpresaConvenio(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True)
     convenio = models.ForeignKey(Convenio, on_delete=models.SET_NULL, null=True)
 
-
-class Estadistica(models.Model):
-    descripcion = models.TextField()
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha = models.DateTimeField()
+    def __str__(self):
+        return f"{self.empresa} - {self.convenio}"
 
 
 class Notificacion(models.Model):
@@ -266,15 +291,8 @@ class Notificacion(models.Model):
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField()
 
-
-class Servicio(models.Model):
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField(null=True, blank=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # Nuevo campo imagen
-
-    def _str_(self):
-        return self.nombre
+    def __str__(self):
+        return f"Notificación para {self.usuario}: {self.mensaje[:30]}..."
 
 
 class Reserva(models.Model):
@@ -288,16 +306,25 @@ class Reserva(models.Model):
     fecha_reserva = models.DateTimeField()
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES)
 
+    def __str__(self):
+        return f"Reserva de {self.usuario} - {self.servicio} - {self.get_estado_display()}"
+
 
 class Recibo(models.Model):
     reserva = models.ForeignKey(Reserva, on_delete=models.SET_NULL, null=True)
     fecha_emision = models.DateTimeField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return f"Recibo #{self.pk} - {self.total}"
+
 
 class ServicioProveedor(models.Model):
     proveedor = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.proveedor} - {self.servicio}"
 
 
 class SolicitudVida(models.Model):
@@ -320,3 +347,6 @@ class SolicitudVida(models.Model):
     beneficiarios = models.TextField(null=True, blank=True)
     detalles_salud = models.TextField(null=True, blank=True)
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Seguro de vida {self.usuario} - {self.fecha_solicitud.date()}"
