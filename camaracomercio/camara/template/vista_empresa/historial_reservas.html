@@ -1,0 +1,52 @@
+{% extends "master.html" %}
+{% block title %}Mis Reservas Empresa{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Mis Reservas</h2>
+    {% if reservas %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>Fecha y Hora</th>
+                <th>Estado</th>
+                <th>Recibo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+            <tr>
+                <td>{{ reserva.servicio.nombre }}</td>
+                <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <span class="badge 
+                        {% if reserva.estado == 'pendiente' %}bg-warning
+                        {% elif reserva.estado == 'confirmada' %}bg-success
+                        {% elif reserva.estado == 'cancelada' %}bg-danger
+                        {% endif %}">
+                        {{ reserva.get_estado_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if reserva.estado == 'confirmada' %}
+                        {% if reserva.recibo %}
+                            <a href="{% url 'ver_recibo' reserva.recibo.pk %}" class="btn btn-info btn-sm">Ver recibo</a>
+                        {% else %}
+                            <form method="post" action="{% url 'generar_recibo' reserva.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Generar recibo</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">No disponible</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info text-center">No tienes reservas registradas.</div>
+    {% endif %}
+</div>
+{% endblock %}

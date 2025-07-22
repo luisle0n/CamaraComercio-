@@ -221,10 +221,22 @@ def faq(request): return render(request, 'vista_publica/faq.html')
 # Quitar todos los decoradores @login_required de las vistas protegidas
 def dashboard(request):
     grupo = get_user_group(request.user)
-    if not request.user.is_authenticated or grupo != 'socio':
+    # Solo revisa is_authenticated y tipo_usuario, no grupos
+    if not request.user.is_authenticated:
         return redirect('home')
-    reservas = []
-    notificaciones = []
+    # Si es empresa, muestra dashboard empresa
+    if getattr(request.user, 'tipo_usuario', None) == 'empresa':
+        reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
+        notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
+        return render(request, 'vista_empresa/dashboard.html', {
+            'reservas': reservas,
+            'notificaciones': notificaciones,
+        })
+    # Si es socio, muestra dashboard socio
+    if grupo != 'socio':
+        return redirect('home')
+    reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
+    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
     return render(request, 'vista_socio_registrado/dashboard.html', {
         'reservas': reservas,
         'notificaciones': notificaciones,
@@ -238,22 +250,31 @@ def perfil_usuario(request):
 
 def historial_reservas(request):
     grupo = get_user_group(request.user)
-    # Solo revisa is_authenticated y tipo_usuario, no grupos
-    if not request.user.is_authenticated or getattr(request.user, 'tipo_usuario', None) != 'socio':
+    if not request.user.is_authenticated:
+        return redirect('home')
+    # Si es empresa, muestra historial empresa
+    if getattr(request.user, 'tipo_usuario', None) == 'empresa':
+        reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
+        return render(request, 'vista_empresa/historial_reservas.html', {'reservas': reservas})
+    # Si es socio, muestra historial socio
+    if getattr(request.user, 'tipo_usuario', None) != 'socio':
         return redirect('home')
     reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
     return render(request, 'vista_socio_registrado/historial_reservas.html', {'reservas': reservas})
 
 def notificaciones(request):
     grupo = get_user_group(request.user)
-    if not request.user.is_authenticated or grupo not in ['socio', 'empresa']:
+    if not request.user.is_authenticated:
+        return redirect('home')
+    # Si es empresa, muestra notificaciones empresa
+    if getattr(request.user, 'tipo_usuario', None) == 'empresa':
+        notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
+        return render(request, 'vista_empresa/notificaciones.html', {'notificaciones': notificaciones})
+    # Si es socio, muestra notificaciones socio
+    if grupo != 'socio':
         return redirect('home')
     notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
-    # Renderiza el template correspondiente según el tipo de usuario
-    if grupo == 'empresa':
-        return render(request, 'vista_empresa/notificaciones.html', {'notificaciones': notificaciones})
-    else:
-        return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
+    return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
 
 def logout_view(request):
     logout(request)
