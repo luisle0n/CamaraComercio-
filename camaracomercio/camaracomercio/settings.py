@@ -103,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+# Se llama Custom User Model o modelo de usuario personalizado.
 AUTH_USER_MODEL = 'camara.Usuario'
 
 JAZZMIN_SETTINGS = {

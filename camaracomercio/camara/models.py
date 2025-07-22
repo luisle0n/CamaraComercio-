@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
+# para crear un modelo de usuario personalizado
 class Usuario(AbstractUser):
     TIPO_USUARIO_CHOICES = [
         ('socio', 'Socio'),
