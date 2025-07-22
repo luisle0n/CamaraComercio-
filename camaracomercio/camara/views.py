@@ -151,13 +151,6 @@ def login_view(request):
             messages.error(request, 'Credenciales inválidas.')
     return render(request, 'vista_publica/login.html')
 
-def dashboard_empresa(request):
-    grupo = get_user_group(request.user)
-    if grupo != 'empresa':
-        return redirect('home')
-    # Aquí puedes agregar la lógica específica para el dashboard de empresas
-    return render(request, 'vista_empresa_registrada/dashboard_empresa.html')
-
 def registro(request):
     tipo = request.POST.get('tipo_usuario', 'persona')
     if request.method == 'POST':
@@ -221,10 +214,9 @@ def faq(request): return render(request, 'vista_publica/faq.html')
 # Quitar todos los decoradores @login_required de las vistas protegidas
 def dashboard(request):
     grupo = get_user_group(request.user)
-    # Solo revisa is_authenticated y tipo_usuario, no grupos
     if not request.user.is_authenticated:
         return redirect('home')
-    # Si es empresa, muestra dashboard empresa
+    # Si es empresa, muestra dashboard empresa con solo sus reservas y notificaciones
     if getattr(request.user, 'tipo_usuario', None) == 'empresa':
         reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
         notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
@@ -232,7 +224,7 @@ def dashboard(request):
             'reservas': reservas,
             'notificaciones': notificaciones,
         })
-    # Si es socio, muestra dashboard socio
+    # Si es socio, muestra dashboard socio con solo sus reservas y notificaciones
     if grupo != 'socio':
         return redirect('home')
     reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
@@ -252,11 +244,11 @@ def historial_reservas(request):
     grupo = get_user_group(request.user)
     if not request.user.is_authenticated:
         return redirect('home')
-    # Si es empresa, muestra historial empresa
+    # Si es empresa, muestra solo sus reservas
     if getattr(request.user, 'tipo_usuario', None) == 'empresa':
         reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')
         return render(request, 'vista_empresa/historial_reservas.html', {'reservas': reservas})
-    # Si es socio, muestra historial socio
+    # Si es socio, muestra solo sus reservas
     if getattr(request.user, 'tipo_usuario', None) != 'socio':
         return redirect('home')
     reservas = Reserva.objects.filter(usuario=request.user).order_by('-fecha_reserva')

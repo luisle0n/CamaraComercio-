@@ -1,25 +1,16 @@
 {% extends "master.html" %}
-{% block title %}Notificaciones{% endblock %}
+{% block title %}Notificaciones Empresa{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4"><i class="fas fa-bell text-primary-custom me-2"></i>Notificaciones</h2>
-    <div class="notificaciones-list">
+    <h2 class="mb-4">Notificaciones</h2>
+    <ul class="list-group">
         {% for notificacion in notificaciones %}
-        <div class="notificacion-card fade-in-up">
-            <div class="notificacion-icon">
-                <i class="fas fa-envelope-open-text"></i>
-            </div>
-            <div class="notificacion-content">
-                <div class="notificacion-mensaje">{{ notificacion.mensaje }}</div>
-                <div class="notificacion-fecha">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</div>
-            </div>
-        </div>
+        <li class="list-group-item">
+            {{ notificacion.mensaje }} <span class="text-muted float-end">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</span>
+        </li>
         {% empty %}
-        <div class="alert alert-info text-center mt-4">
-            <i class="fas fa-info-circle me-2"></i>No tienes notificaciones.
-        </div>
+        <li class="list-group-item">No tienes notificaciones.</li>
         {% endfor %}
-    </div>
+    </ul>
 </div>
 {% endblock %}
-
