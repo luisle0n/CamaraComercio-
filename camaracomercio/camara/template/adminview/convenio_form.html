@@ -28,19 +28,19 @@
             <label class="form-label">Categoría</label>
             <select name="categoria" class="form-select" required>
                 <option value="">Seleccione...</option>
-                {% for key, val in convenio.CATEGORIA_CHOICES %}
+                {% for key, val in CATEGORIA_CHOICES %}
                     <option value="{{ key }}" {% if convenio.categoria == key %}selected{% endif %}>{{ val }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="mb-3">
             <label class="form-label">¿Tiene descuento?</label>
-            <select name="tiene_descuento" class="form-select">
+            <select name="tiene_descuento" class="form-select" id="tiene_descuento_select">
                 <option value="no" {% if not convenio.tiene_descuento %}selected{% endif %}>No</option>
                 <option value="si" {% if convenio.tiene_descuento %}selected{% endif %}>Sí</option>
             </select>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" id="porcentaje_descuento_group">
             <label class="form-label">Porcentaje descuento</label>
             <input type="number" name="porcentaje_descuento" class="form-control" min="0" max="100" step="0.01"
                    value="{{ convenio.porcentaje_descuento|default:'' }}">
@@ -62,5 +62,22 @@
         <a href="{% url 'admin_convenios_list' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
     </form>
 </div>
+<script>
+    // Interactividad para mostrar/ocultar el campo de porcentaje de descuento
+    document.addEventListener('DOMContentLoaded', function() {
+        var select = document.getElementById('tiene_descuento_select');
+        var descuentoGroup = document.getElementById('porcentaje_descuento_group');
+        function toggleDescuento() {
+            if (select.value === 'si') {
+                descuentoGroup.style.display = 'block';
+            } else {
+                descuentoGroup.style.display = 'none';
+            }
+        }
+        select.addEventListener('change', toggleDescuento);
+        toggleDescuento();
+    });
+</script>
 {% endblock %}
+
 

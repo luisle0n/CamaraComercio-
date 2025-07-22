@@ -68,6 +68,19 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'registro_empresa' %}">Registro de empresa</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'convenios' %}">Convenios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'servicios_publicos' %}">Servicios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notificaciones' %}">Notificaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'historial_reservas' %}">Mis Reservas</a>
+                        </li>
+                        
                     {% elif user.is_authenticated and user.tipo_usuario == 'socio' %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home' %}">Inicio</a>

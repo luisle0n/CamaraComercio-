@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+{% block title %}Notificaciones Empresa{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Notificaciones</h2>
+    <ul class="list-group">
+        {% for notificacion in notificaciones %}
+        <li class="list-group-item">
+            {{ notificacion.mensaje }} <span class="text-muted float-end">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No tienes notificaciones.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -159,7 +159,7 @@ class AfiliacionJuridica(Afiliacion):
 
     def __str__(self):
         return f"{self.razon_social[:20]} - {self.ruc_o_cedula} - {self.get_estado_display()}"
-
+## ---
 
 class Empresa(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='empresa')
@@ -283,6 +283,34 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return f"Notificación para {self.usuario}: {self.mensaje[:30]}..."
+
+    @staticmethod
+    def enviar_reserva(reserva):
+        """Envía notificación automática al usuario cuando se crea una reserva."""
+        # Asegura que fecha_reserva sea un objeto datetime
+        from django.utils.dateparse import parse_datetime
+        fecha = reserva.fecha_reserva
+        if isinstance(fecha, str):
+            fecha = parse_datetime(fecha)
+        fecha_str = fecha.strftime('%d/%m/%Y %H:%M') if fecha else str(reserva.fecha_reserva)
+        mensaje = f"Se ha creado una nueva reserva para el servicio '{reserva.servicio.nombre}' el {fecha_str}."
+        Notificacion.objects.create(
+            usuario=reserva.usuario,
+            mensaje=mensaje,
+            fecha_envio=timezone.now()
+        )
+
+    @staticmethod
+    def enviar_convenio(convenio):
+        """Envía notificación automática a todos los usuarios activos cuando se crea un convenio."""
+        mensaje = f"Nuevo convenio disponible: '{convenio.nombre}'. ¡Revisa los beneficios y descuentos!"
+        from .models import Usuario  # Importación local para evitar problemas de migración
+        for usuario in Usuario.objects.filter(is_active=True):
+            Notificacion.objects.create(
+                usuario=usuario,
+                mensaje=mensaje,
+                fecha_envio=timezone.now()
+            )
 
 
 class Reserva(models.Model):

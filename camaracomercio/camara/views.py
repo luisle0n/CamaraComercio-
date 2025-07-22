@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import Http404
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo, Notificacion
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -246,11 +246,14 @@ def historial_reservas(request):
 
 def notificaciones(request):
     grupo = get_user_group(request.user)
-    if not request.user.is_authenticated or grupo != 'socio':
+    if not request.user.is_authenticated or grupo not in ['socio', 'empresa']:
         return redirect('home')
-    from .models import Notificacion
     notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
-    return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
+    # Renderiza el template correspondiente según el tipo de usuario
+    if grupo == 'empresa':
+        return render(request, 'vista_empresa/notificaciones.html', {'notificaciones': notificaciones})
+    else:
+        return render(request, 'vista_socio_registrado/notificaciones.html', {'notificaciones': notificaciones})
 
 def logout_view(request):
     logout(request)
@@ -420,7 +423,7 @@ def admin_convenios_list(request):
 
 @admin_required
 def admin_convenio_create(request):
-    from .models import Empresa, EmpresaConvenio
+    from .models import Empresa, EmpresaConvenio, Convenio, Notificacion
     empresas = Empresa.objects.all()
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -447,12 +450,18 @@ def admin_convenio_create(request):
         if empresa_id:
             empresa = Empresa.objects.get(pk=empresa_id)
             EmpresaConvenio.objects.create(empresa=empresa, convenio=convenio)
+        # Notificación automática a todos los usuarios
+        Notificacion.enviar_convenio(convenio)
         return redirect('admin_convenios_list')
-    return render(request, 'adminview/convenio_form.html', {'accion': 'Crear', 'empresas': empresas})
+    return render(request, 'adminview/convenio_form.html', {
+        'accion': 'Crear',
+        'empresas': empresas,
+        'CATEGORIA_CHOICES': Convenio.CATEGORIA_CHOICES,
+    })
 
 @admin_required
 def admin_convenio_edit(request, pk):
-    from .models import Empresa, EmpresaConvenio
+    from .models import Empresa, EmpresaConvenio, Convenio
     convenio = Convenio.objects.get(pk=pk)
     empresas = Empresa.objects.all()
     empresa_convenio = EmpresaConvenio.objects.filter(convenio=convenio).first()
@@ -490,7 +499,8 @@ def admin_convenio_edit(request, pk):
         'convenio': convenio,
         'accion': 'Editar',
         'empresas': empresas,
-        'empresa_id_actual': empresa_id_actual
+        'empresa_id_actual': empresa_id_actual,
+        'CATEGORIA_CHOICES': Convenio.CATEGORIA_CHOICES,
     })
 
 @admin_required
@@ -639,16 +649,17 @@ def servicios_publicos(request):
 def reservar_servicio(request, pk):
     servicio = Servicio.objects.get(pk=pk)
     if request.method == 'POST':
-        # Procesa la reserva y muestra mensaje
-        Reserva.objects.create(
+        fecha_reserva = request.POST.get('fecha_reserva')
+        reserva = Reserva.objects.create(
             usuario=request.user,
             servicio=servicio,
-            fecha_reserva=timezone.now(),
+            fecha_reserva=fecha_reserva if fecha_reserva else timezone.now(),
             estado='pendiente'
         )
+        # Notificación automática
+        Notificacion.enviar_reserva(reserva)
         messages.success(request, f'Reserva realizada para el servicio: {servicio.nombre}')
         return redirect('servicios_publicos')
-    # Si es GET, muestra el formulario de reserva
     return render(request, 'vista_socio_registrado/reservar_servicio.html', {
         'servicio': servicio,
     })

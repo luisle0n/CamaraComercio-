@@ -542,6 +542,57 @@ h2 {
     border-radius: 3px;
 }
 
+/* Notificaciones personalizadas */
+.notificaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.notificacion-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.08);
+    padding: 18px 22px;
+    transition: box-shadow 0.3s;
+    border-left: 6px solid var(--color-azul-brillante);
+    animation: fadeInUp 0.5s;
+}
+
+.notificacion-card:hover {
+    box-shadow: 0 6px 18px rgba(21,61,108,0.13);
+    border-left: 6px solid var(--color-dorado);
+}
+
+.notificacion-icon {
+    font-size: 2.1rem;
+    color: var(--color-azul-brillante);
+    margin-right: 18px;
+    flex-shrink: 0;
+}
+
+.notificacion-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.notificacion-mensaje {
+    font-size: 1.08rem;
+    color: var(--color-logo);
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.notificacion-fecha {
+    font-size: 0.97em;
+    color: var(--color-gris);
+    font-style: italic;
+    margin-top: 2px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-section h1 {
