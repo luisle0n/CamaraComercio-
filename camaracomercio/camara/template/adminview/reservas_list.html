@@ -16,8 +16,20 @@
         <tbody>
             {% for reserva in reservas %}
             <tr>
-                <td>{{ reserva.usuario.email }}</td>
-                <td>{{ reserva.servicio.nombre }}</td>
+                <td>
+                    {% if reserva.usuario %}
+                        {{ reserva.usuario.nombre|default:reserva.usuario.email|default:"-" }}
+                    {% else %}
+                        <span class="text-muted">Sin usuario</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if reserva.servicio %}
+                        {{ reserva.servicio.nombre }}
+                    {% else %}/
+                        <span class="text-muted">Sin servicio</span>
+                    {% endif %}
+                </td>
                 <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
                 <td>
                     <span class="badge 

@@ -1,0 +1,31 @@
+{% extends "master.html" %}
+{% block title %}Crear Servicio{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:600px;">
+    <h2 class="mb-4">{{ accion|default:"Crear" }} Servicio</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="nombre" class="form-control" value="{{ servicio.nombre|default:'' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="3">{{ servicio.descripcion|default:'' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input type="number" name="precio" class="form-control" min="0" step="0.01" value="{{ servicio.precio|default:'' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Imagen</label>
+            <input type="file" name="imagen" class="form-control">
+            {% if servicio.imagen %}
+                <img src="{{ servicio.imagen.url }}" alt="Imagen actual" style="max-width:120px;margin-top:10px;">
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-success w-100">{{ accion|default:"Crear" }}</button>
+        <a href="{% url 'admin_servicios_list' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
