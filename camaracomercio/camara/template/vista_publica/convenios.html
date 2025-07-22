@@ -16,13 +16,24 @@
     <div class="row justify-content-center">
         {% for convenio in convenios %}
         <div class="col-md-4 mb-4 d-flex align-items-stretch">
-            <div class="card shadow-sm h-100 w-100 border-0 rounded-4">
+            <div class="card shadow-sm h-100 w-100 border-0 rounded-4 card-convenio position-relative">
                 {% if convenio.imagen %}
                 <img src="{{ convenio.imagen.url }}" alt="{{ convenio.nombre }}" class="card-img-top rounded-top-4"
                     style="max-height:170px;object-fit:cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center rounded-top-4"
+                    style="height:170px;">
+                    <span class="text-muted"><i class="fas fa-image fa-2x"></i> Sin imagen</span>
+                </div>
+                {% endif %}
+                {% if convenio.tiene_descuento and convenio.porcentaje_descuento %}
+                <span class="discount-badge">{{ convenio.porcentaje_descuento }}% DESCUENTO</span>
                 {% endif %}
                 <div class="card-body text-center d-flex flex-column justify-content-between">
-                    <h5 class="card-title mt-2 fw-bold">{{ convenio.nombre }}</h5>
+                    <h5 class="card-title mt-2 fw-bold text-primary">{{ convenio.nombre }}</h5>
+                    <span class="badge bg-light text-primary mb-2">
+                        {{ convenio.get_categoria_display }}
+                    </span>
                     <p class="card-text mb-2">{{ convenio.descripcion }}</p>
                     {% if convenio.fecha_fin %}
                     <div class="text-muted mb-2" style="font-size:0.98em;">
@@ -30,27 +41,25 @@
                         Vigente hasta {{ convenio.fecha_fin|date:"d/m/Y" }}
                     </div>
                     {% endif %}
-                    {% if convenio.tiene_descuento and convenio.porcentaje_descuento %}
-                    <div class="mb-2">
-                        <span class="badge bg-success" style="font-size:1em;">
-                            {{ convenio.porcentaje_descuento }}% DESCUENTO
-                        </span>
-                    </div>
-                    {% endif %}
                     {% with beneficios=convenio.beneficio_set.all %}
                     {% if beneficios %}
-                    <div class="mt-3">
+                    <div class="mt-3 text-start">
                         <strong>Beneficios:</strong>
-                        <ul style="margin-top:8px;">
+                        <ul class="ps-3" style="margin-top:8px;">
                             {% for beneficio in beneficios %}
                             <li style="color:#40b45b;">
-                                {{ beneficio.descripcion }}
+                                <i class="fas fa-check-circle me-1"></i>{{ beneficio.descripcion }}
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
                     {% endif %}
                     {% endwith %}
+                </div>
+                <div class="card-footer bg-white border-0 text-center">
+                    <span class="text-secondary" style="font-size:0.95em;">
+                        <i class="fas fa-building me-1"></i> Cámara de Comercio de Loja
+                    </span>
                 </div>
             </div>
         </div>
