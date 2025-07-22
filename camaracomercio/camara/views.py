@@ -783,3 +783,15 @@ def ver_recibo(request, pk):
         messages.error(request, 'No tienes permiso para ver este recibo.')
         return redirect('historial_reservas')
     return render(request, 'vista_socio_registrado/recibo.html', {'recibo': recibo})
+
+@permission_required('camara.view_afiliacionnatural', login_url='/login/')
+def admin_ver_afiliados(request):
+    grupo = get_user_group(request.user)
+    if grupo != 'admin':
+        return redirect('home')
+    afiliados_naturales = AfiliacionNatural.objects.filter(estado='aprobada')
+    afiliados_juridicos = AfiliacionJuridica.objects.filter(estado='aprobada')
+    return render(request, 'adminview/ver_afiliados.html', {
+        'afiliados_naturales': afiliados_naturales,
+        'afiliados_juridicos': afiliados_juridicos,
+    })

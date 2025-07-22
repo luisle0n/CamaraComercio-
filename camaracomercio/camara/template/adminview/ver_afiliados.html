@@ -1,0 +1,40 @@
+{% extends "master.html" %}
+{% block title %}Afiliados{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Afiliados</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="mb-3 text-primary">Personas Naturales</h4>
+            <div class="list-group">
+                {% for af in afiliados_naturales %}
+                <div class="list-group-item">
+                    <strong>{{ af.nombre_comercial_o_nombres }}</strong>
+                    <br><small class="text-muted">Cédula/RUC: {{ af.ruc_o_cedula }}</small>
+                    <br><small class="text-muted">Correo: {{ af.correo_electronico }}</small>
+                    <br><span class="badge bg-success">{{ af.get_estado_display }}</span>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted">No hay afiliados naturales.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h4 class="mb-3 text-success">Personas Jurídicas</h4>
+            <div class="list-group">
+                {% for af in afiliados_juridicos %}
+                <div class="list-group-item">
+                    <strong>{{ af.razon_social }}</strong>
+                    <br><small class="text-muted">Nombre comercial: {{ af.nombre_comercial_o_nombres }}</small>
+                    <br><small class="text-muted">RUC: {{ af.ruc_o_cedula }}</small>
+                    <br><small class="text-muted">Correo: {{ af.correo_electronico }}</small>
+                    <br><span class="badge bg-success">{{ af.get_estado_display }}</span>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted">No hay afiliados jurídicos.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -36,4 +36,5 @@ urlpatterns = [
     path('admin-reservas/<int:pk>/cambiar-estado/', views.admin_reserva_estado, name='admin_reserva_estado'),
     path('reservas/<int:pk>/generar-recibo/', views.generar_recibo, name='generar_recibo'),
     path('recibo/<int:pk>/', views.ver_recibo, name='ver_recibo'),
+    path('admin-ver-afiliados/', views.admin_ver_afiliados, name='admin_ver_afiliados'),
 ]
