@@ -1,9 +1,10 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Registro de Usuario{% endblock %}
 {% block content %}
 <div class="container mt-5" style="max-width:1100px;">
     <h2 class="mb-4 text-center">Registro de Usuario</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="registro-form">
         {% csrf_token %}
         <div class="mb-3">
             <label for="tipo_usuario" class="form-label">Tipo de Usuario</label>
@@ -45,8 +46,24 @@
                             <label class="form-label fw-bold">¿Cuáles son las redes sociales que más usas?</label>
                         </div>
                     {% endif %}
-                    {% if field.name != 'tipo_persona' %}
-                    <div class="mb-3 col-md-6">
+                    {% if field.name == 'comprobante_pago' %}
+                    <div class="mb-3 col-md-6 d-flex align-items-center">
+                        <div style="flex:1;">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-info ms-2" id="btn-imprimir-juridica">
+                            <i class="fas fa-print"></i> Imprimir formulario
+                        </button>
+                    </div>
+                    {% elif field.name != 'tipo_persona' %}
+                    <div class="mb-3 col-md-4">
                         {{ field.label_tag }}
                         {{ field }}
                         {% if field.help_text %}
@@ -61,29 +78,35 @@
                     {% endif %}
                 {% endfor %}
             </div>
+            <!-- Modal para imprimir y firmar -->
+            <div class="modal fade" id="modalImprimirJuridica" tabindex="-1" aria-labelledby="modalImprimirJuridicaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="modalImprimirJuridicaLabel">
+                                <i class="fas fa-file-alt me-2"></i>Formulario de Persona Jurídica
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="print-content-juridica">
+                            <!-- Aquí se genera el resumen del formulario para imprimir -->
+                        </div>
+                        <div class="modal-footer flex-column">
+                            <button type="button" class="btn btn-secondary w-100 mb-2" onclick="printJuridicaForm()">Imprimir</button>
+                            <div class="w-100 mb-2">
+                                <label class="form-label">Firma digital (escribe tu nombre completo):</label>
+                                <input type="text" class="form-control" id="firma-digital" placeholder="Firma aquí...">
+                            </div>
+                            <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal" onclick="guardarFirma()">Guardar firma y cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <button type="submit" class="btn btn-success w-100">Registrarse</button>
     </form>
-    <script>
-        function setDisabled(containerId, disabled) {
-            var container = document.getElementById(containerId);
-            if (!container) return;
-            var elements = container.querySelectorAll('input, select, textarea');
-            elements.forEach(function(el) {
-                el.disabled = disabled;
-            });
-        }
-        function toggleCampos() {
-            var tipo = document.getElementById('tipo_usuario').value;
-            var personaVisible = tipo === 'persona';
-            var empresaVisible = tipo === 'empresa';
-            document.getElementById('persona-campos').style.display = personaVisible ? 'block' : 'none';
-            document.getElementById('empresa-campos').style.display = empresaVisible ? 'block' : 'none';
-            setDisabled('persona-campos', !personaVisible);
-            setDisabled('empresa-campos', !empresaVisible);
-        }
-        document.getElementById('tipo_usuario').addEventListener('change', toggleCampos);
-        window.onload = toggleCampos;
-    </script>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/registro.js' %}"></script>
 {% endblock %}
