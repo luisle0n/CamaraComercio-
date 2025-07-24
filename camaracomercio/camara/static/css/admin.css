@@ -1,0 +1,335 @@
+.convenio-card {
+    background: var(--color-blanco);
+    border-radius: 32px;
+    box-shadow: 0 8px 32px rgba(21,61,108,0.13);
+    max-width: 600px;
+    margin: 48px auto 32px auto;
+    padding: 44px 36px 36px 36px;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid var(--color-logo);
+    animation: fadeInUp 0.7s;
+}
+.convenio-card h1 {
+    color: var(--color-logo);
+    font-size: 2.3rem;
+    font-weight: bold;
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+    text-align: center;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+.convenio-divider {
+    height: 4px;
+    width: 60px;
+    background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+    border-radius: 2px;
+    margin: 0 auto 32px auto;
+    opacity: 0.7;
+}
+.convenio-btn {
+    background: linear-gradient(90deg, var(--color-logo), var(--color-azul-brillante));
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 14px;
+    padding: 13px 0;
+    font-size: 1.18rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.10);
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+.convenio-btn:hover {
+    background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+    color: var(--color-blanco);
+    transform: translateY(-2px) scale(1.03);
+}
+.convenio-cancel {
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1.08rem;
+    margin-top: 12px;
+    background: var(--color-dorado);
+    border: none;
+    color: var(--color-blanco);
+    transition: background 0.3s;
+}
+.convenio-cancel:hover {
+    background: #9a6f11;
+    color: var(--color-blanco);
+}
+/* Animación */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+/* Responsive */
+@media (max-width: 700px) {
+    .convenio-card {
+        padding: 18px 6px;
+        max-width: 98vw;
+    }
+    .convenio-card h1 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Reservas agrupadas por usuario */
+.reservas-usuario-card {
+    background: var(--color-blanco);
+    border-radius: 22px;
+    box-shadow: 0 4px 18px rgba(21,61,108,0.10);
+    margin-bottom: 32px;
+    padding: 32px 28px 18px 28px;
+    border: 1.5px solid var(--color-logo);
+    transition: box-shadow 0.2s;
+}
+
+.reservas-usuario-card:hover {
+    box-shadow: 0 8px 32px rgba(21,61,108,0.13);
+}
+
+.reservas-usuario-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.reservas-usuario-avatar {
+    background: var(--color-logo);
+    color: var(--color-blanco);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    font-weight: bold;
+}
+
+.reservas-usuario-nombre {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-logo);
+}
+
+.reservas-usuario-email {
+    font-size: 1.05rem;
+    color: var(--color-gris);
+}
+
+.reservas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.reservas-table th {
+    background: var(--color-logo);
+    color: var(--color-blanco);
+    font-weight: 600;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 12px;
+}
+
+.reservas-table td {
+    background: var(--color-gris-claro);
+    border: none;
+    border-radius: 0 0 8px 8px;
+    padding: 10px 12px;
+    vertical-align: middle;
+}
+
+.reservas-table .badge {
+    font-size: 1em;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+}
+
+.reservas-table .btn {
+    font-size: 0.98em;
+    padding: 6px 16px;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .reservas-usuario-card {
+        padding: 14px 4px 8px 4px;
+    }
+    .reservas-usuario-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    .reservas-table th, .reservas-table td {
+        font-size: 0.98em;
+        padding: 7px 6px;
+    }
+}
+
+/* Afiliados */
+.afiliados-section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-logo);
+    margin-bottom: 32px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.afiliados-card-group {
+    background: var(--color-blanco);
+    border-radius: 22px;
+    box-shadow: 0 4px 18px rgba(21,61,108,0.10);
+    padding: 32px 24px 24px 24px;
+    margin-bottom: 32px;
+    border: 1.5px solid var(--color-logo);
+}
+
+.afiliados-card-group h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+}
+
+.afiliado-item {
+    background: var(--color-gris-claro);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.07);
+    margin-bottom: 18px;
+    padding: 18px 20px;
+    border-left: 6px solid var(--color-azul-brillante);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.afiliado-item:last-child {
+    margin-bottom: 0;
+}
+
+.afiliado-item strong {
+    color: var(--color-logo);
+    font-size: 1.12rem;
+}
+
+.afiliado-item .badge {
+    font-size: 1em;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    margin-top: 6px;
+}
+
+.afiliado-item .text-muted {
+    font-size: 0.98em;
+}
+
+@media (max-width: 768px) {
+    .afiliados-card-group {
+        padding: 12px 4px 12px 4px;
+    }
+    .afiliados-section-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* Empresas */
+.empresas-section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-logo);
+    margin-bottom: 32px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.empresas-card-group {
+    background: var(--color-blanco);
+    border-radius: 22px;
+    box-shadow: 0 4px 18px rgba(21,61,108,0.10);
+    padding: 32px 24px 24px 24px;
+    margin-bottom: 32px;
+    border: 1.5px solid var(--color-logo);
+}
+
+.empresa-item {
+    background: var(--color-gris-claro);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.07);
+    margin-bottom: 18px;
+    padding: 18px 20px;
+    border-left: 6px solid var(--color-azul-brillante);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.empresa-item:last-child {
+    margin-bottom: 0;
+}
+
+.empresa-item strong {
+    color: var(--color-logo);
+    font-size: 1.12rem;
+}
+
+.empresa-item .text-muted {
+    font-size: 0.98em;
+}
+
+@media (max-width: 768px) {
+    .empresas-card-group {
+        padding: 12px 4px 12px 4px;
+    }
+    .empresas-section-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* Modal recibo animado */
+#modalRecibo {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(21,61,108,0.18);
+    align-items: center;
+    justify-content: center;
+    animation: fadeInUp 0.4s;
+}
+#modalRecibo .modal-content {
+    background: var(--color-blanco, #fff);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(21,61,108,0.13);
+    padding: 32px 28px;
+    max-width: 420px;
+    width: 95vw;
+    animation: fadeInUp 0.5s;
+    position: relative;
+}
+#modalRecibo .close-modal {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: var(--color-logo, #153D6C);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#modalRecibo .close-modal:hover {
+    background: var(--color-azul-brillante, #0367EC);
+}

@@ -1,0 +1,111 @@
+/* Paleta Cámara de Comercio de Loja */
+:root {
+    --color-logo: #153D6C;
+    --color-azul-brillante: #0367EC;
+    --color-dorado: #B48314;
+    --color-amarillo-claro: #F1DB62;
+    --color-blanco: #FFFFFF;
+    --color-gris-claro: #F8F9FA;
+    --color-gris: #6C757D;
+    --color-oscuro: #212529;
+}
+
+.detalle-afiliacion-card {
+    background: linear-gradient(135deg, var(--color-gris-claro), var(--color-blanco));
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(21,61,108,0.10);
+    padding: 40px 28px;
+    margin-bottom: 40px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.detalle-afiliacion-card h2 {
+    color: var(--color-logo);
+    font-weight: bold;
+    margin-bottom: 24px;
+    font-size: 2.2rem;
+}
+
+.detalle-afiliacion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+}
+
+.detalle-afiliacion-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-gris-claro);
+    font-size: 1.08rem;
+    color: var(--color-oscuro);
+}
+
+.detalle-afiliacion-list li strong {
+    color: var(--color-logo);
+    min-width: 160px;
+    display: inline-block;
+}
+
+.detalle-afiliacion-list li .badge {
+    font-size: 1em;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    background: var(--color-dorado);
+    color: var(--color-blanco);
+}
+
+.detalle-afiliacion-list li .badge.aprobada {
+    background: var(--color-azul-brillante);
+}
+
+.detalle-afiliacion-list li .badge.rechazada {
+    background: #dc3545;
+}
+
+.detalle-afiliacion-list li .badge.pendiente {
+    background: var(--color-amarillo-claro);
+    color: var(--color-oscuro);
+}
+
+.detalle-afiliacion-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.detalle-afiliacion-actions .btn-success {
+    background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+    border: none;
+    color: var(--color-blanco);
+    font-weight: 600;
+}
+
+.detalle-afiliacion-actions .btn-danger {
+    background: var(--color-dorado);
+    border: none;
+    color: var(--color-blanco);
+    font-weight: 600;
+}
+
+.detalle-afiliacion-actions .btn-secondary {
+    background: var(--color-logo);
+    border: none;
+    color: var(--color-blanco);
+    font-weight: 600;
+}
+
+.detalle-afiliacion-comprobante a {
+    color: var(--color-azul-brillante);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .detalle-afiliacion-card {
+        padding: 20px 8px;
+    }
+    .detalle-afiliacion-list li strong {
+        min-width: 120px;
+    }
+}

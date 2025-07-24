@@ -1,46 +1,267 @@
+<!--
+Este archivo es una réplica simplificada y adaptada del home de https://camaradecomercioloja.com/
+Incluye: header con menú, hero animado, secciones de beneficios, convenios, preguntas frecuentes, enlaces rápidos y footer.
+Para una integración Django, los enlaces y recursos estáticos deben adaptarse.
+-->
 {% extends "master.html" %}
-{% block title %}Inicio - Cámara de Comercio{% endblock %}
+{% load static %}
+{% block title %}Home - Cámara de Comercio Loja{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+/* Hero animado */
+.hero-animated-bg {
+    background: linear-gradient(135deg, #153D6C 0%, #0367EC 100%);
+    color: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(21,61,108,0.13);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 48px;
+    min-height: 420px;
+    animation: fadeInUp 1s;
+}
+.hero-animated-bg .hero-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.13;
+    z-index: 0;
+    animation: float 6s ease-in-out infinite;
+}
+.hero-animated-bg .hero-shape.shape1 {
+    width: 180px; height: 180px; left: -60px; top: -60px; background: #F1DB62;
+    animation-delay: 0s;
+}
+.hero-animated-bg .hero-shape.shape2 {
+    width: 120px; height: 120px; right: -40px; top: 60px; background: #B48314;
+    animation-delay: 1.5s;
+}
+.hero-animated-bg .hero-shape.shape3 {
+    width: 90px; height: 90px; left: 40%; bottom: -30px; background: #fff;
+    animation-delay: 2.5s;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0);}
+    50% { transform: translateY(-30px);}
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 70px 0 60px 0;
+    text-align: center;
+}
+.hero-content h1 {
+    font-size: 3.2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    animation: fadeInUp 1.2s;
+}
+.hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: #F1DB62;
+    animation: fadeInUp 1.5s;
+}
+.hero-content .hero-btns .btn {
+    font-size: 1.18rem;
+    font-weight: 600;
+    border-radius: 12px;
+    margin: 0 10px;
+    padding: 12px 32px;
+    animation: fadeInUp 1.7s;
+}
+.hero-content .hero-btns .btn-primary {
+    background: linear-gradient(90deg, #F1DB62, #B48314);
+    color: #153D6C;
+    border: none;
+}
+.hero-content .hero-btns .btn-primary:hover {
+    background: linear-gradient(90deg, #B48314, #F1DB62);
+    color: #fff;
+}
+.hero-content .hero-btns .btn-outline-primary {
+    border: 2px solid #fff;
+    color: #fff;
+    background: transparent;
+}
+.hero-content .hero-btns .btn-outline-primary:hover {
+    background: #fff;
+    color: #153D6C;
+}
+@media (max-width: 700px) {
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content { padding: 38px 0 28px 0; }
+}
+
+/* Animación fadeInUp */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* Animación para las cards de beneficios */
+.beneficio-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(21,61,108,0.10);
+    padding: 32px 18px;
+    margin-bottom: 28px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: fadeInUp 1s;
+    border-left: 6px solid #F1DB62;
+}
+.beneficio-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(21,61,108,0.18);
+    border-left: 6px solid #B48314;
+}
+.beneficio-icon {
+    font-size: 2.5rem;
+    color: #0367EC;
+    margin-bottom: 12px;
+    animation: float 4s infinite;
+}
+@media (max-width: 700px) {
+    .beneficio-card {
+        padding: 18px 6px;
+    }
+}
+</style>
+{% endblock %}
 {% block content %}
-<div class="container mt-5 text-center">
-    <h1>Bienvenido a la Cámara de Comercio de Loja</h1>
-    <p>Promoviendo el desarrollo económico de la provincia de Loja desde 1950.</p>
-    <a href="{% url 'login' %}" class="btn btn-primary me-2">Iniciar Sesión</a>
-    <a href="{% url 'registro' %}" class="btn btn-outline-primary">Registrarse</a>
+<!-- Header simplificado -->
+
+
+<!-- Hero animado -->
+<div class="container mt-5">
+  <div class="hero-animated-bg">
+    <span class="hero-shape shape1"></span>
+    <span class="hero-shape shape2"></span>
+    <span class="hero-shape shape3"></span>
+    <div class="hero-content">
+      <h1>106 años apoyando el crecimiento de pequeños y grandes empresarios</h1>
+      <p>Mediante acuerdos de cooperación y convenios brindamos a nuestros socios herramientas necesarias para su desarrollo comercial.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn btn-primary me-2">Conoce más</a>
+        <a href="#" class="btn btn-outline-primary">Afíliate</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Sección informativa -->
+<!-- Sección de beneficios -->
 <div class="container my-5">
-    <h2 class="text-center mb-3 porque-titulo">¿Por qué ser parte de nuestra institución?</h2>
-    <p class="text-center mb-5 porque-descripcion">Somos el gremio que impulsa el desarrollo económico de Loja, brindando apoyo integral a empresarios y emprendedores.</p>
-    <div class="row justify-content-center">
-        <div class="col-6 col-md-3 mb-4 text-center">
-            <div class="porque-icon-bg">
-                <i class="fa-solid fa-building fa-2x porque-icon"></i>
-            </div>
-            <h5 class="porque-subtitulo">Representación Gremial</h5>
-            <p class="porque-texto">Defendemos los intereses de comerciantes, empresarios y emprendedores de Loja.</p>
-        </div>
-        <div class="col-6 col-md-3 mb-4 text-center">
-            <div class="porque-icon-bg">
-                <i class="fa-solid fa-award fa-2x porque-icon"></i>
-            </div>
-            <h5 class="porque-subtitulo">Convenios Empresariales</h5>
-            <p class="porque-texto">Accede a descuentos especiales en servicios financieros, hotelería, consultoría y más.</p>
-        </div>
-        <div class="col-6 col-md-3 mb-4 text-center">
-            <div class="porque-icon-bg">
-                <i class="fa-solid fa-chart-line fa-2x porque-icon"></i>
-            </div>
-            <h5 class="porque-subtitulo">Desarrollo Económico</h5>
-            <p class="porque-texto">Promovemos el crecimiento económico local y el fortalecimiento empresarial.</p>
-        </div>
-        <div class="col-6 col-md-3 mb-4 text-center">
-            <div class="porque-icon-bg">
-                <i class="fa-solid fa-handshake fa-2x porque-icon"></i>
-            </div>
-            <h5 class="porque-subtitulo">Networking Empresarial</h5>
-            <p class="porque-texto">Conecta con otros empresarios y genera oportunidades de negocio.</p>
-        </div>
+  <div class="row align-items-center">
+    <div class="col-md-6 mb-4 mb-md-0">
+      <img src="{% static 'img/forma-parte.png' %}" alt="Forma parte" class="img-fluid rounded shadow">
     </div>
+    <div class="col-md-6">
+      <h2 class="mb-3">Beneficios</h2>
+      <h4 class="mb-3">Forma parte de la Cámara de Comercio de Loja</h4>
+      <p>Nuestro gremio a lo largo de los años ha estado siempre preocupado por brindar mejores servicios y beneficios a sus afiliados, por ello de manera permanente se realizan acciones que permitan su desarrollo e innovación.</p>
+      <ul>
+        <li>Servicios Médicos</li>
+        <li>Servicios Exequiales</li>
+        <li>Póliza de vida</li>
+        <li>Descuentos exclusivos</li>
+        <li>Asesorías técnicas</li>
+      </ul>
+      <a href="#" class="btn btn-primary mt-3">Conoce más beneficios</a>
+    </div>
+  </div>
+</div>
+
+<!-- Sección de convenios destacados -->
+<div class="container my-5">
+  <h2 class="text-center mb-4">Nuestros convenios</h2>
+  <div class="row justify-content-center">
+    <div class="col-6 col-md-3 mb-4 text-center">
+      <img src="{% static 'img/convenio1.png' %}" alt="Convenio 1" class="img-fluid rounded mb-2" style="height:100px;">
+      <h5>Clínica Hospital San José</h5>
+      <p class="small">Descuentos en servicios médicos y hospitalarios.</p>
+    </div>
+    <div class="col-6 col-md-3 mb-4 text-center">
+      <img src="{% static 'img/convenio2.png' %}" alt="Convenio 2" class="img-fluid rounded mb-2" style="height:100px;">
+      <h5>Edes UTPL</h5>
+      <p class="small">Descuentos en maestrías y programas abiertos.</p>
+    </div>
+    <div class="col-6 col-md-3 mb-4 text-center">
+      <img src="{% static 'img/convenio3.png' %}" alt="Convenio 3" class="img-fluid rounded mb-2" style="height:100px;">
+      <h5>Funeraria Jaramillo</h5>
+      <p class="small">Servicios exequiales preferenciales.</p>
+    </div>
+    <div class="col-6 col-md-3 mb-4 text-center">
+      <img src="{% static 'img/convenio4.png' %}" alt="Convenio 4" class="img-fluid rounded mb-2" style="height:100px;">
+      <h5>Farmacias Cuxibamba</h5>
+      <p class="small">Descuentos en productos y medicamentos.</p>
+    </div>
+  </div>
+  <div class="text-center">
+    <a href="#" class="btn btn-outline-primary">Todos los convenios</a>
+  </div>
+</div>
+
+<!-- Sección de preguntas frecuentes -->
+<div class="container my-5">
+  <h2 class="text-center mb-4">Preguntas frecuentes</h2>
+  <div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq1">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+          ¿Cuáles son los requisitos para afiliarse?
+        </button>
+      </h2>
+      <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          <ul>
+            <li>Copia del RUC o RIMPE</li>
+            <li>Copia de cédula de identidad</li>
+            <li>Formularios de afiliación</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq2">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+          ¿Qué beneficios ofrece la Cámara?
+        </button>
+      </h2>
+      <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Descuentos exclusivos, seguro de vida, atención médica preferencial, asesorías técnicas y más.
+        </div>
+      </div>
+    </div>
+    <!-- ...puedes agregar más preguntas aquí... -->
+  </div>
+</div>
+
+<!-- Enlaces rápidos -->
+<div class="container my-5">
+  <h2 class="text-center mb-4">Enlaces rápidos</h2>
+  <div class="row justify-content-center">
+    <div class="col-6 col-md-2 mb-3 text-center">
+      <a href="https://www.supercias.gob.ec/portalscvs/index.htm" target="_blank">
+        <img src="{% static 'img/logo-supercias.png' %}" alt="Supercias" class="img-fluid mb-2" style="height:60px;">
+        <div>Supercias</div>
+      </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3 text-center">
+      <a href="https://www.sri.gob.ec/web/intersri/home" target="_blank">
+        <img src="{% static 'img/logo-sri.png' %}" alt="SRI" class="img-fluid mb-2" style="height:60px;">
+        <div>SRI</div>
+      </a>
+    </div>
+    <div class="col-6 col-md-2 mb-3 text-center">
+      <a href="https://www.loja.gob.ec/" target="_blank">
+        <img src="{% static 'img/logo-municipio-loja.png' %}" alt="Municipio Loja" class="img-fluid mb-2" style="height:60px;">
+        <div>Municipio Loja</div>
+      </a>
+    </div>
+    <!-- ...otros enlaces rápidos... -->
+  </div>
 </div>
 {% endblock %}

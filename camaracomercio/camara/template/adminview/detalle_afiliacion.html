@@ -1,53 +1,55 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Detalle Afiliación{% endblock %}
 {% block content %}
-<h2>Detalle de afiliación</h2>
-
-{% if tipo_persona == 'natural' %}
-    <!-- Persona natural -->
-    <p><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</p>
-    <p><strong>RUC o cédula:</strong> {{ afiliacion.ruc_o_cedula }}</p>
-{% elif tipo_persona == 'juridica' %}
-    <!-- Persona jurídica -->
-    <p><strong>Razón social:</strong> {{ afiliacion.razon_social }}</p>
-    <p><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</p>
-    <p><strong>RUC:</strong> {{ afiliacion.ruc_o_cedula }}</p>
-    <p><strong>Representante legal:</strong> {{ afiliacion.rep_legal_nombres }} {{ afiliacion.rep_legal_apellido1 }}</p>
-    <p><strong>Correo empresa:</strong> {{ afiliacion.correo_empresa }}</p>
-    <p><strong>Teléfonos:</strong>
-        {{ afiliacion.telefono1 }}
-        {% if afiliacion.telefono2 %}, {{ afiliacion.telefono2 }}{% endif %}
-        {% if afiliacion.telefono3 %}, {{ afiliacion.telefono3 }}{% endif %}
-        {% if afiliacion.celular %}, Celular: {{ afiliacion.celular }}{% endif %}
-    </p>
-    <p><strong>Actividad económica:</strong> {{ afiliacion.actividad_economica }}</p>
-    <p><strong>Contacto jurídico:</strong> {{ afiliacion.contacto_juridico_correo }} / {{ afiliacion.contacto_juridico_telefono }}</p>
-    <p><strong>Contacto natural:</strong> {{ afiliacion.contacto_natural_correo }} / {{ afiliacion.contacto_natural_telefono }}</p>
-    <p><strong>Titular:</strong> {{ afiliacion.titular_nombre }} / {{ afiliacion.titular_telefono }} / {{ afiliacion.titular_cedula }}</p>
-{% endif %}
-
-<p><strong>Correo:</strong> {{ afiliacion.correo_electronico }}</p>
-<p><strong>Tipo de persona:</strong> {{ afiliacion.get_tipo_persona_display }}</p>
-<p><strong>Estado:</strong> {{ afiliacion.get_estado_display }}</p>
-<p><strong>Fecha de solicitud:</strong> {{ afiliacion.fecha_solicitud }}</p>
-<p><strong>Comprobante de pago:</strong>
-    {% if afiliacion.comprobante_pago %}
-    <a href="{{ afiliacion.comprobante_pago.url }}" target="_blank">Ver archivo</a>
-    {% else %}
-    No adjuntado
-    {% endif %}
-</p>
-
-<form method="post">
-    {% csrf_token %}
-    {% if afiliacion.estado == 'pendiente' %}
-    <button type="submit" name="action" value="aprobar" class="btn btn-success">✅ Aprobar</button>
-    <button type="submit" name="action" value="rechazar" class="btn btn-danger">❌ Rechazar</button>
-    {% else %}
-    <p><em>Esta afiliación ya ha sido procesada.</em></p>
-    {% endif %}
-</form>
-
-<a href="{% url 'afiliaciones_pendientes' %}" class="btn btn-secondary">Volver a la lista</a>
-
+<link rel="stylesheet" href="{% static 'css/afiliacion_detalle.css' %}">
+<div class="detalle-afiliacion-card">
+    <h2>Detalle de afiliación</h2>
+    <ul class="detalle-afiliacion-list">
+        {% if tipo_persona == 'natural' %}
+            <li><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</li>
+            <li><strong>RUC o cédula:</strong> {{ afiliacion.ruc_o_cedula }}</li>
+        {% elif tipo_persona == 'juridica' %}
+            <li><strong>Razón social:</strong> {{ afiliacion.razon_social }}</li>
+            <li><strong>Nombre comercial:</strong> {{ afiliacion.nombre_comercial_o_nombres }}</li>
+            <li><strong>RUC:</strong> {{ afiliacion.ruc_o_cedula }}</li>
+            <li><strong>Representante legal:</strong> {{ afiliacion.rep_legal_nombres }} {{ afiliacion.rep_legal_apellido1 }}</li>
+            <li><strong>Correo empresa:</strong> {{ afiliacion.correo_empresa }}</li>
+            <li><strong>Teléfonos:</strong>
+                {{ afiliacion.telefono1 }}
+                {% if afiliacion.telefono2 %}, {{ afiliacion.telefono2 }}{% endif %}
+                {% if afiliacion.telefono3 %}, {{ afiliacion.telefono3 }}{% endif %}
+                {% if afiliacion.celular %}, Celular: {{ afiliacion.celular }}{% endif %}
+            </li>
+            <li><strong>Actividad económica:</strong> {{ afiliacion.actividad_economica }}</li>
+            <li><strong>Contacto jurídico:</strong> {{ afiliacion.contacto_juridico_correo }} / {{ afiliacion.contacto_juridico_telefono }}</li>
+            <li><strong>Contacto natural:</strong> {{ afiliacion.contacto_natural_correo }} / {{ afiliacion.contacto_natural_telefono }}</li>
+            <li><strong>Titular:</strong> {{ afiliacion.titular_nombre }} / {{ afiliacion.titular_telefono }} / {{ afiliacion.titular_cedula }}</li>
+        {% endif %}
+        <li><strong>Correo:</strong> {{ afiliacion.correo_electronico }}</li>
+        <li><strong>Tipo de persona:</strong> {{ afiliacion.get_tipo_persona_display }}</li>
+        <li>
+            <strong>Estado:</strong>
+            <span class="badge {{ afiliacion.estado }}">{{ afiliacion.get_estado_display }}</span>
+        </li>
+        <li><strong>Fecha de solicitud:</strong> {{ afiliacion.fecha_solicitud }}</li>
+        <li class="detalle-afiliacion-comprobante"><strong>Comprobante de pago:</strong>
+            {% if afiliacion.comprobante_pago %}
+            <a href="{{ afiliacion.comprobante_pago.url }}" target="_blank">Ver archivo</a>
+            {% else %}
+            No adjuntado
+            {% endif %}
+        </li>
+    </ul>
+    <form method="post" class="detalle-afiliacion-actions">
+        {% csrf_token %}
+        {% if afiliacion.estado == 'pendiente' %}
+        <button type="submit" name="action" value="aprobar" class="btn btn-success">Aprobar</button>
+        <button type="submit" name="action" value="rechazar" class="btn btn-danger">Rechazar</button>
+        {% else %}
+        <p><em>Esta afiliación ya ha sido procesada.</em></p>
+        {% endif %}
+    </form>
+    <a href="{% url 'afiliaciones_pendientes' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+</div>
 {% endblock %}

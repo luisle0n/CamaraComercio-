@@ -1,51 +1,105 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Reservas{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Todas las Reservas</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Servicio</th>
-                <th>Fecha y Hora</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reserva in reservas %}
-            <tr>
-                <td>
-                    {% if reserva.usuario %}
-                        {{ reserva.usuario.nombre|default:reserva.usuario.email|default:"-" }}
-                    {% else %}
-                        <span class="text-muted">Sin usuario</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if reserva.servicio %}
-                        {{ reserva.servicio.nombre }}
-                    {% else %}/
-                        <span class="text-muted">Sin servicio</span>
-                    {% endif %}
-                </td>
-                <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <span class="badge 
-                        {% if reserva.estado == 'pendiente' %}bg-warning
-                        {% elif reserva.estado == 'confirmada' %}bg-success
-                        {% elif reserva.estado == 'cancelada' %}bg-danger
-                        {% endif %}">
-                        {{ reserva.get_estado_display }}
-                    </span>
-                </td>
-                <td>
-                    <a href="{% url 'admin_reserva_estado' reserva.pk %}" class="btn btn-primary btn-sm">Cambiar estado</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2 class="mb-4">Reservas por Usuario</h2>
+    <form method="get" class="mb-4 row g-2 align-items-end">
+        <div class="col-md-4">
+            <label for="estado" class="form-label mb-1">Filtrar por estado</label>
+            <select name="estado" id="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                <option value="pendiente" {% if request.GET.estado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                <option value="confirmada" {% if request.GET.estado == "confirmada" %}selected{% endif %}>Confirmada</option>
+                <option value="cancelada" {% if request.GET.estado == "cancelada" %}selected{% endif %}>Cancelada</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn convenio-btn w-100">Filtrar</button>
+        </div>
+    </form>
+    {% regroup reservas by usuario as reservas_por_usuario %}
+    {% for grupo in reservas_por_usuario %}
+        {% with reservas_filtradas=grupo.list|dictsort:"fecha_reserva" %}
+        {% if not request.GET.estado or reservas_filtradas|length > 0 %}
+            {% with reservas_estado=reservas_filtradas|dictsort:"fecha_reserva" %}
+            {% if not request.GET.estado or reservas_estado|length > 0 %}
+                {% with reservas_estado=reservas_estado|default:grupo.list %}
+                {% if reservas_estado|length > 0 %}
+                <div class="reservas-usuario-card mb-4">
+                    <div class="reservas-usuario-header">
+                        <div class="reservas-usuario-avatar">
+                            {% if grupo.grouper %}
+                                {{ grupo.grouper.nombre|default:grupo.grouper.email|default:"?"|slice:":1"|upper }}
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="reservas-usuario-nombre">
+                                {% if grupo.grouper %}
+                                    {{ grupo.grouper.nombre|default:grupo.grouper.email|default:"Sin usuario" }}
+                                {% else %}
+                                    Sin usuario
+                                {% endif %}
+                            </div>
+                            {% if grupo.grouper and grupo.grouper.email %}
+                            <div class="reservas-usuario-email">{{ grupo.grouper.email }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="reservas-table w-100">
+                            <thead>
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reserva in grupo.list %}
+                                    {% if not request.GET.estado or reserva.estado == request.GET.estado %}
+                                    <tr>
+                                        <td>
+                                            {% if reserva.servicio %}
+                                                {{ reserva.servicio.nombre }}
+                                            {% else %}
+                                                <span class="text-muted">Sin servicio</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if reserva.estado == 'pendiente' %}bg-warning
+                                                {% elif reserva.estado == 'confirmada' %}bg-success
+                                                {% elif reserva.estado == 'cancelada' %}bg-danger
+                                                {% endif %}">
+                                                {{ reserva.get_estado_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'admin_reserva_estado' reserva.pk %}" class="btn btn-primary btn-sm">Cambiar estado</a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+            {% endif %}
+            {% endwith %}
+        {% endif %}
+        {% endwith %}
+    {% empty %}
+        <div class="alert alert-info text-center">No hay reservas registradas.</div>
+    {% endfor %}
 </div>
 {% endblock %}

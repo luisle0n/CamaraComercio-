@@ -1,5 +1,9 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Convenios{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -48,6 +52,13 @@
                             {% for beneficio in beneficios %}
                             <li style="color:#28a745;">
                                 {{ beneficio.descripcion }}
+                                <a href="{% url 'admin_beneficio_edit' beneficio.pk %}" class="btn btn-sm btn-outline-primary ms-2">Editar</a>
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-danger ms-1 btn-eliminar-beneficio"
+                                    data-id="{{ beneficio.pk }}"
+                                    data-desc="{{ beneficio.descripcion|truncatechars:30 }}">
+                                    Eliminar
+                                </button>
                             </li>
                             {% endfor %}
                         </ul>
@@ -57,7 +68,7 @@
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <a href="{% url 'admin_convenio_edit' convenio.pk %}" class="btn btn-primary btn-sm">Editar</a>
-                    <a href="{% url 'admin_convenio_delete' convenio.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <button type="button" class="btn btn-danger btn-sm btn-eliminar-convenio" data-id="{{ convenio.pk }}" data-nombre="{{ convenio.nombre }}">Eliminar</button>
                     <a href="{% url 'admin_beneficio_create' convenio.pk %}" class="btn btn-warning btn-sm">Añadir Beneficio</a>
                 </div>
             </div>
@@ -69,5 +80,79 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Modal de confirmación de eliminación de convenio -->
+<div class="modal fade" id="modalEliminarConvenio" tabindex="-1" aria-labelledby="modalEliminarConvenioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="formEliminarConvenio">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalEliminarConvenioLabel">Eliminar Convenio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar el convenio <strong id="nombreConvenioEliminar"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación de beneficio -->
+<div class="modal fade" id="modalEliminarBeneficio" tabindex="-1" aria-labelledby="modalEliminarBeneficioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="formEliminarBeneficio">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalEliminarBeneficioLabel">Eliminar Beneficio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar el beneficio <strong id="descBeneficioEliminar"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Convenio modal
+    let convenioId = null;
+    let form = document.getElementById('formEliminarConvenio');
+    let modal = new bootstrap.Modal(document.getElementById('modalEliminarConvenio'));
+    document.querySelectorAll('.btn-eliminar-convenio').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            convenioId = this.getAttribute('data-id');
+            document.getElementById('nombreConvenioEliminar').textContent = this.getAttribute('data-nombre');
+            form.action = "{% url 'admin_convenio_delete' 0 %}".replace('0', convenioId);
+            modal.show();
+        });
+    });
+
+    // Beneficio modal
+    let beneficioId = null;
+    let formBeneficio = document.getElementById('formEliminarBeneficio');
+    let modalBeneficio = new bootstrap.Modal(document.getElementById('modalEliminarBeneficio'));
+    document.querySelectorAll('.btn-eliminar-beneficio').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            beneficioId = this.getAttribute('data-id');
+            document.getElementById('descBeneficioEliminar').textContent = this.getAttribute('data-desc');
+            formBeneficio.action = "{% url 'admin_beneficio_delete' 0 %}".replace('0', beneficioId);
+            modalBeneficio.show();
+        });
+    });
+});
+</script>
 {% endblock %}
 

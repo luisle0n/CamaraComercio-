@@ -1,8 +1,16 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Enviar Notificación{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:500px;">
-    <h2 class="mb-4">Enviar Notificación a Usuario</h2>
+<div class="convenio-card" style="max-width:500px;">
+    <h1>Enviar Notificación a Usuario</h1>
+    <div class="convenio-divider"></div>
+    <div class="mb-3">
+        <input type="text" id="buscador-usuario" class="form-control" placeholder="Buscar por nombre, email o cédula...">
+    </div>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
@@ -10,7 +18,9 @@
             <select class="form-select" id="usuario" name="usuario" required>
                 <option value="">Seleccione un usuario</option>
                 {% for u in usuarios %}
-                    <option value="{{ u.pk }}">{{ u.email }} ({{ u.nombre }})</option>
+                    <option value="{{ u.pk }}" data-cedula="{{ u.cedula|default:'' }}" data-email="{{ u.email|default:'' }}" data-nombre="{{ u.nombre|default:'' }}">
+                        {{ u.email }} ({{ u.nombre }}){% if u.cedula %} - {{ u.cedula }}{% endif %}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -18,7 +28,7 @@
             <label for="mensaje" class="form-label">Mensaje</label>
             <textarea class="form-control" id="mensaje" name="mensaje" rows="3" required></textarea>
         </div>
-        <button type="submit" class="btn btn-success w-100">Enviar notificación</button>
+        <button type="submit" class="convenio-btn w-100">Enviar notificación</button>
     </form>
     {% if messages %}
         {% for message in messages %}
@@ -26,4 +36,36 @@
         {% endfor %}
     {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const buscador = document.getElementById('buscador-usuario');
+    const select = document.getElementById('usuario');
+    const opciones = Array.from(select.options);
+
+    buscador.addEventListener('input', function() {
+        const filtro = this.value.trim().toLowerCase();
+        select.innerHTML = '';
+        const firstOption = document.createElement('option');
+        firstOption.value = '';
+        firstOption.textContent = 'Seleccione un usuario';
+        select.appendChild(firstOption);
+
+        opciones.forEach(function(opt, idx) {
+            if(idx === 0) return; // Saltar la opción por defecto original
+            const texto = opt.textContent.toLowerCase();
+            const cedula = (opt.getAttribute('data-cedula') || '').toLowerCase();
+            const email = (opt.getAttribute('data-email') || '').toLowerCase();
+            const nombre = (opt.getAttribute('data-nombre') || '').toLowerCase();
+            if (
+                texto.includes(filtro) ||
+                cedula.includes(filtro) ||
+                email.includes(filtro) ||
+                nombre.includes(filtro)
+            ) {
+                select.appendChild(opt);
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

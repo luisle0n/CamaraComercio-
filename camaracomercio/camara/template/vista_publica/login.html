@@ -1,27 +1,37 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:400px;">
-    <h2 class="mb-4 text-center">Iniciar Sesión</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="identificador" class="form-label">Cédula o Correo</label>
-            <input type="text" class="form-control" id="identificador" name="identificador" required>
+<div class="container mt-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-6 text-center d-none d-md-block">
+            <img src="{% static 'img/logo_grande.png' %}" alt="Logo Cámara de Comercio de Loja" style="max-width: 320px; width: 100%;">
         </div>
-        <div class="mb-3">
-            <label for="contrasena" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+        <div class="col-md-6">
+            <div class="p-4 bg-white rounded shadow" style="max-width:400px; margin:auto;">
+                <h3 class="mb-4 text-center" style="color:#153D6C;">Ingreso de sección</h3>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="identificador" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="identificador" name="identificador" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contrasena" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Acceder &rarr;</button>
+                </form>
+                <div class="alert alert-info mt-4" style="font-size:0.97em;">
+                    Si es tu primer ingreso, deberás cambiar tu contraseña después de iniciar sesión con la clave temporal enviada a tu correo.
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-    </form>
-    <div class="alert alert-info mt-4" style="font-size:0.97em;">
-        Si es tu primer ingreso, deberás cambiar tu contraseña después de iniciar sesión con la clave temporal enviada a tu correo.
     </div>
 </div>
 {% endblock %}

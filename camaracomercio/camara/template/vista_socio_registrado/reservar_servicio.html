@@ -1,20 +1,51 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Reservar Servicio{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:500px;">
-    <h2 class="mb-4">Reservar Servicio</h2>
-    <form method="post">
-        {% csrf_token %}
+<div class="container mt-5" style="max-width:600px;">
+    <div class="convenio-card mb-4">
+        <h1>Detalle del Servicio</h1>
+        <div class="convenio-divider"></div>
         <div class="mb-3">
-            <label class="form-label">Servicio</label>
-            <input type="text" class="form-control" value="{{ servicio.nombre }}" readonly>
+            <strong>Nombre:</strong> {{ servicio.nombre }}
         </div>
         <div class="mb-3">
-            <label for="fecha_reserva" class="form-label">Fecha y Hora</label>
-            <input type="datetime-local" class="form-control" id="fecha_reserva" name="fecha_reserva" required>
+            <strong>Descripción:</strong>
+            <div style="color:var(--color-logo);font-size:1.08rem;">{{ servicio.descripcion|default:"Sin descripción" }}</div>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Reservar</button>
-    </form>
+        <div class="mb-3">
+            <strong>Precio:</strong>
+            {% if servicio.precio %}
+                <span class="badge bg-success">${{ servicio.precio }}</span>
+            {% else %}
+                <span class="badge bg-secondary">Sin precio</span>
+            {% endif %}
+        </div>
+        {% if servicio.imagen %}
+        <div class="mb-3 text-center">
+            <img src="{{ servicio.imagen.url }}" alt="Imagen del servicio" style="max-width:220px;max-height:160px;border-radius:12px;box-shadow:0 2px 8px rgba(21,61,108,0.10);">
+        </div>
+        {% endif %}
+    </div>
+    <div class="convenio-card">
+        <h1>Reservar Servicio</h1>
+        <div class="convenio-divider"></div>
+        <form method="post" id="registro-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Servicio</label>
+                <input type="text" class="form-control" value="{{ servicio.nombre }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="fecha_reserva" class="form-label">Fecha y Hora</label>
+                <input type="datetime-local" class="form-control" id="fecha_reserva" name="fecha_reserva" required>
+            </div>
+            <button type="submit" class="convenio-btn w-100">Reservar</button>
+        </form>
+    </div>
 </div>
 {% endblock %}
 

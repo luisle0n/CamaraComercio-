@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+{% load static %}
+{% block title %}Mis Empresas{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="empresas-section-title mb-4">Mis Empresas Registradas</div>
+    <div class="empresas-card-group">
+        <div class="row">
+            {% for empresa in empresas %}
+            <div class="col-md-6 mb-4">
+                <div class="empresa-item">
+                    <strong>{{ empresa.nombre }}</strong>
+                    <span class="text-muted">RUC: {{ empresa.ruc }}</span>
+                    {% if empresa.direccion %}
+                    <span class="text-muted">Dirección: {{ empresa.direccion }}</span>
+                    {% endif %}
+                    {% if empresa.telefono %}
+                    <span class="text-muted">Teléfono: {{ empresa.telefono }}</span>
+                    {% endif %}
+                    {% if empresa.tipo_negocio %}
+                    <span class="text-muted">Tipo de negocio: {{ empresa.tipo_negocio }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empresa-item text-muted">No tienes empresas registradas.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

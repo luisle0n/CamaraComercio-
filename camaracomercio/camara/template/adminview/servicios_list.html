@@ -28,7 +28,7 @@
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <a href="{% url 'admin_servicio_edit' servicio.pk %}" class="btn btn-primary btn-sm">Editar</a>
-                    <a href="{% url 'admin_servicio_delete' servicio.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <button type="button" class="btn btn-danger btn-sm btn-eliminar-servicio" data-id="{{ servicio.pk }}" data-nombre="{{ servicio.nombre }}">Eliminar</button>
                 </div>
             </div>
         </div>
@@ -39,4 +39,42 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Modal de confirmación de eliminación de servicio -->
+<div class="modal fade" id="modalEliminarServicio" tabindex="-1" aria-labelledby="modalEliminarServicioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="formEliminarServicio">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalEliminarServicioLabel">Eliminar Servicio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar el servicio <strong id="nombreServicioEliminar"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let servicioId = null;
+    let form = document.getElementById('formEliminarServicio');
+    let modal = new bootstrap.Modal(document.getElementById('modalEliminarServicio'));
+    document.querySelectorAll('.btn-eliminar-servicio').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            servicioId = this.getAttribute('data-id');
+            document.getElementById('nombreServicioEliminar').textContent = this.getAttribute('data-nombre');
+            form.action = "{% url 'admin_servicio_delete' 0 %}".replace('0', servicioId);
+            modal.show();
+        });
+    });
+});
+</script>
 {% endblock %}

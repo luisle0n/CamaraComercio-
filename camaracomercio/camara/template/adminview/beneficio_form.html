@@ -1,15 +1,22 @@
 {% extends "master.html" %}
-{% block title %}Añadir Beneficio{% endblock %}
+{% load static %}
+{% block title %}{% if beneficio %}Editar Beneficio{% else %}Añadir Beneficio{% endif %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/Formularios.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:500px;">
-    <h2 class="mb-4">Añadir Beneficio a {{ convenio.nombre }}</h2>
-    <form method="post">
+<div class="container mt-5" style="max-width:600px;">
+    <h2 class="mb-4">{% if beneficio %}Editar{% else %}Añadir{% endif %} Beneficio a {{ convenio.nombre }}</h2>
+    <form method="post" id="registro-form">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción del beneficio</label>
-            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+        <div id="beneficios-list">
+            <div class="mb-3 beneficio-item">
+                <label for="id_descripcion_0" class="form-label">Descripción del beneficio</label>
+                <textarea class="form-control" id="id_descripcion_0" name="descripcion" rows="3" required>{% if beneficio %}{{ beneficio.descripcion }}{% endif %}</textarea>
+            </div>
         </div>
-        <button type="submit" class="btn btn-success w-100">Guardar beneficio</button>
+        <button type="button" class="add-beneficio-btn" id="add-beneficio" title="Añadir otro beneficio">+</button>
+        <button type="submit" class="btn btn-success w-100 mt-3">{% if beneficio %}Guardar cambios{% else %}Guardar beneficio(s){% endif %}</button>
         <a href="{% url 'admin_convenios_list' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
     </form>
     {% if messages %}
@@ -18,4 +25,21 @@
         {% endfor %}
     {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let beneficioIdx = 1;
+    document.getElementById('add-beneficio').addEventListener('click', function() {
+        const list = document.getElementById('beneficios-list');
+        const div = document.createElement('div');
+        div.className = 'mb-3 beneficio-item';
+        div.innerHTML = `
+            <label for="id_descripcion_${beneficioIdx}" class="form-label">Descripción del beneficio</label>
+            <textarea class="form-control" id="id_descripcion_${beneficioIdx}" name="descripcion" rows="3" required></textarea>
+        `;
+        list.appendChild(div);
+        beneficioIdx++;
+    });
+});
+</script>
 {% endblock %}
+ 

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.http import Http404
 import secrets
-from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm
+from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm, ConvenioForm, ServicioForm, EmpresaForm
 from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo, Notificacion
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
@@ -14,10 +14,14 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.contrib.auth import update_session_auth_hash
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 from django.db import IntegrityError
 import logging
 from django.urls import reverse
+from django.shortcuts import redirect, render
+from .forms import EmpresaForm
+from .models import Empresa
+import weasyprint
 
 # Create your views here.
 def get_user_group(user):
@@ -179,31 +183,23 @@ def registro(request):
         'tipo': tipo
     })
 
+from .forms import EmpresaForm
+from .models import Empresa
+
 def registro_empresa(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        direccion = request.POST.get('direccion')
-        telefono = request.POST.get('telefono')
-        tipo_negocio = request.POST.get('tipo_negocio')
-        ruc = request.POST.get('ruc')
-        representante = request.user  # El usuario autenticado
-
-        # Validación básica
-        if nombre and ruc:
-            Empresa.objects.create(
-                nombre=nombre,
-                direccion=direccion,
-                telefono=telefono,
-                tipo_negocio=tipo_negocio,
-                ruc=ruc,
-                representante=representante
-            )
-            messages.success(request, 'Empresa registrada correctamente.')
-            return redirect('home')
-        else:
-            messages.error(request, 'Debes completar los campos obligatorios.')
-
-    return render(request, 'vista_empresa/registroEmpresa.html')
+        form = EmpresaForm(request.POST)
+        if form.is_valid():
+            empresa = form.save(commit=False)
+            empresa.representante = request.user
+            empresa.save()
+            # Cambia aquí la redirección a una URL válida, por ejemplo al home del usuario
+            return redirect('home')  # Usa el nombre de una URL existente, como 'home' o 'perfil_usuario'
+    else:
+        form = EmpresaForm(initial={'representante': request.user.pk})
+    return render(request, 'vista_socio_registrado/registroEmpresa.html', {
+        'form': form
+    })
 
 def afiliacion(request): return render(request, 'vista_publica/afiliacion.html')
 def convenios(request):
@@ -436,84 +432,32 @@ def admin_convenios_list(request):
 
 @admin_required
 def admin_convenio_create(request):
-    from .models import Empresa, EmpresaConvenio, Convenio, Notificacion
-    empresas = Empresa.objects.all()
+    from .forms import ConvenioForm
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        descripcion = request.POST.get('descripcion')
-        fecha_fin = request.POST.get('fecha_fin')
-        imagen = request.FILES.get('imagen')
-        categoria = request.POST.get('categoria')
-        tiene_descuento = request.POST.get('tiene_descuento') == 'si'
-        porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
-        empresa_id = request.POST.get('empresa')
-        convenio = Convenio(
-            nombre=nombre,
-            descripcion=descripcion,
-            categoria=categoria,
-            tiene_descuento=tiene_descuento,
-            porcentaje_descuento=porcentaje_descuento if tiene_descuento and porcentaje_descuento else None
-        )
-        if fecha_fin:
-            convenio.fecha_fin = fecha_fin
-        if imagen:
-            convenio.imagen = imagen
-        convenio.save()
-        # Relaciona el convenio con la empresa seleccionada
-        if empresa_id:
-            empresa = Empresa.objects.get(pk=empresa_id)
-            EmpresaConvenio.objects.create(empresa=empresa, convenio=convenio)
-        # Notificación automática a todos los usuarios
-        Notificacion.enviar_convenio(convenio)
-        return redirect('admin_convenios_list')
+        form = ConvenioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_convenios_list')
+    else:
+        form = ConvenioForm()
     return render(request, 'adminview/convenio_form.html', {
-        'accion': 'Crear',
-        'empresas': empresas,
-        'CATEGORIA_CHOICES': Convenio.CATEGORIA_CHOICES,
+        'form': form,
+        'accion': 'Crear'
     })
 
 @admin_required
 def admin_convenio_edit(request, pk):
-    from .models import Empresa, EmpresaConvenio, Convenio
     convenio = Convenio.objects.get(pk=pk)
-    empresas = Empresa.objects.all()
-    empresa_convenio = EmpresaConvenio.objects.filter(convenio=convenio).first()
-    empresa_id_actual = empresa_convenio.empresa.pk if empresa_convenio and empresa_convenio.empresa else None
     if request.method == 'POST':
-        convenio.nombre = request.POST.get('nombre')
-        convenio.descripcion = request.POST.get('descripcion')
-        fecha_fin = request.POST.get('fecha_fin')
-        imagen = request.FILES.get('imagen')
-        categoria = request.POST.get('categoria')
-        tiene_descuento = request.POST.get('tiene_descuento') == 'si'
-        porcentaje_descuento = request.POST.get('porcentaje_descuento') or None
-        empresa_id = request.POST.get('empresa')
-        if fecha_fin:
-            convenio.fecha_fin = fecha_fin
-        else:
-            convenio.fecha_fin = None
-        if imagen:
-            convenio.imagen = imagen
-        if categoria:
-            convenio.categoria = categoria
-        convenio.tiene_descuento = tiene_descuento
-        convenio.porcentaje_descuento = porcentaje_descuento if tiene_descuento and porcentaje_descuento else None
-        convenio.save()
-        # Actualiza la relación empresa-convenio
-        if empresa_id:
-            empresa = Empresa.objects.get(pk=empresa_id)
-            ec, created = EmpresaConvenio.objects.get_or_create(convenio=convenio)
-            ec.empresa = empresa
-            ec.save()
-        else:
-            EmpresaConvenio.objects.filter(convenio=convenio).delete()
-        return redirect('admin_convenios_list')
-    return render(request, 'adminview/convenio_form.html', {
+        form = ConvenioForm(request.POST, request.FILES, instance=convenio)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_convenios_list')
+    else:
+        form = ConvenioForm(instance=convenio)
+    return render(request, 'adminview/convenio_edit.html', {
+        'form': form,
         'convenio': convenio,
-        'accion': 'Editar',
-        'empresas': empresas,
-        'empresa_id_actual': empresa_id_actual,
-        'CATEGORIA_CHOICES': Convenio.CATEGORIA_CHOICES,
     })
 
 @admin_required
@@ -532,36 +476,31 @@ def admin_servicios_list(request):
 @admin_required
 def admin_servicio_create(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        descripcion = request.POST.get('descripcion')
-        precio = request.POST.get('precio')
-        imagen = request.FILES.get('imagen')
-        servicio = Servicio(nombre=nombre, descripcion=descripcion)
-        if precio:
-            servicio.precio = precio
-        if imagen:
-            servicio.imagen = imagen
-        servicio.save()
-        return redirect('admin_servicios_list')
-    return render(request, 'adminview/servicio_form.html', {'accion': 'Crear'})
+        form = ServicioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_servicios_list')
+    else:
+        form = ServicioForm()
+    return render(request, 'adminview/servicio_form.html', {
+        'form': form,
+        'accion': 'Crear'
+    })
 
 @admin_required
 def admin_servicio_edit(request, pk):
     servicio = Servicio.objects.get(pk=pk)
     if request.method == 'POST':
-        servicio.nombre = request.POST.get('nombre')
-        servicio.descripcion = request.POST.get('descripcion')
-        precio = request.POST.get('precio')
-        imagen = request.FILES.get('imagen')
-        if precio:
-            servicio.precio = precio
-        else:
-            servicio.precio = None
-        if imagen:
-            servicio.imagen = imagen
-        servicio.save()
-        return redirect('admin_servicios_list')
-    return render(request, 'adminview/servicio_form.html', {'servicio': servicio, 'accion': 'Editar'})
+        form = ServicioForm(request.POST, request.FILES, instance=servicio)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_servicios_list')
+    else:
+        form = ServicioForm(instance=servicio)
+    return render(request, 'adminview/servicio_form.html', {
+        'form': form,
+        'accion': 'Editar'
+    })
 
 @admin_required
 def admin_servicio_delete(request, pk):
@@ -574,8 +513,14 @@ def admin_servicio_delete(request, pk):
 @admin_required
 def admin_reservas_list(request):
     from .models import Reserva
-    reservas = Reserva.objects.select_related('usuario', 'servicio').order_by('-fecha_reserva')
-    return render(request, 'adminview/reservas_list.html', {'reservas': reservas})
+    estado = request.GET.get('estado')
+    reservas = Reserva.objects.select_related('usuario', 'servicio').all()
+    if estado:
+        reservas = reservas.filter(estado=estado)
+    reservas = reservas.order_by('-fecha_reserva')
+    return render(request, 'adminview/reservas_list.html', {
+        'reservas': reservas,
+    })
 
 @admin_required
 def admin_reserva_estado(request, pk):
@@ -749,40 +694,39 @@ def admin_beneficio_create(request, convenio_id):
     from .models import Convenio, Beneficio
     convenio = Convenio.objects.get(pk=convenio_id)
     if request.method == 'POST':
+        descripciones = request.POST.getlist('descripcion')
+        for desc in descripciones:
+            if desc.strip():
+                Beneficio.objects.create(convenio=convenio, descripcion=desc.strip())
+        # Redirige a la lista de convenios o donde corresponda
+        return redirect('admin_convenios_list')
+    return render(request, 'adminview/beneficio_form.html', {'convenio': convenio})
+
+@admin_required
+def admin_beneficio_edit(request, pk):
+    from .models import Beneficio
+    beneficio = Beneficio.objects.get(pk=pk)
+    if request.method == 'POST':
         descripcion = request.POST.get('descripcion')
         if descripcion:
-            Beneficio.objects.create(convenio=convenio, descripcion=descripcion)
-            messages.success(request, 'Beneficio añadido correctamente.')
+            beneficio.descripcion = descripcion
+            beneficio.save()
+            messages.success(request, 'Beneficio editado correctamente.')
             return redirect('admin_convenios_list')
         else:
             messages.error(request, 'Debes ingresar la descripción del beneficio.')
-    return render(request, 'adminview/beneficio_form.html', {'convenio': convenio})
+    return render(request, 'adminview/beneficio_form.html', {'convenio': beneficio.convenio, 'beneficio': beneficio})
 
-@login_required(login_url='/login/')
-def generar_recibo(request, pk):
-    reserva = Reserva.objects.get(pk=pk)
-    if reserva.usuario != request.user or reserva.estado != 'confirmada':
-        messages.error(request, 'No tienes permiso para generar el recibo.')
-        return redirect('historial_reservas')
-    if hasattr(reserva, 'recibo'):
-        messages.info(request, 'Ya existe un recibo para esta reserva.')
-        return redirect('historial_reservas')
-    # Genera el recibo
-    recibo = Recibo.objects.create(
-        reserva=reserva,
-        fecha_emision=timezone.now(),
-        total=reserva.servicio.precio or 0
-    )
-    messages.success(request, 'Recibo generado correctamente.')
-    return redirect('historial_reservas')
-
-@login_required(login_url='/login/')
-def ver_recibo(request, pk):
-    recibo = Recibo.objects.get(pk=pk)
-    if recibo.reserva.usuario != request.user:
-        messages.error(request, 'No tienes permiso para ver este recibo.')
-        return redirect('historial_reservas')
-    return render(request, 'vista_socio_registrado/recibo.html', {'recibo': recibo})
+@admin_required
+def admin_beneficio_delete(request, pk):
+    from .models import Beneficio
+    beneficio = Beneficio.objects.get(pk=pk)
+    convenio = beneficio.convenio
+    if request.method == 'POST':
+        beneficio.delete()
+        messages.success(request, 'Beneficio eliminado correctamente.')
+        return redirect('admin_convenios_list')
+    return render(request, 'adminview/beneficio_confirm_delete.html', {'beneficio': beneficio, 'convenio': convenio})
 
 @permission_required('camara.view_afiliacionnatural', login_url='/login/')
 def admin_ver_afiliados(request):
@@ -794,4 +738,58 @@ def admin_ver_afiliados(request):
     return render(request, 'adminview/ver_afiliados.html', {
         'afiliados_naturales': afiliados_naturales,
         'afiliados_juridicos': afiliados_juridicos,
+    })
+
+@login_required(login_url='/login/')
+def generar_recibo(request, pk):
+    reserva = get_object_or_404(Reserva, pk=pk)
+    if reserva.usuario != request.user or reserva.estado != 'confirmada':
+        messages.error(request, 'No tienes permiso para generar el recibo.')
+        return redirect('historial_reservas')
+    if hasattr(reserva, 'recibo'):
+        messages.info(request, 'Ya existe un recibo para esta reserva.')
+        return redirect('historial_reservas')
+    recibo = Recibo.objects.create(
+        reserva=reserva,
+        fecha_emision=timezone.now(),
+        total=reserva.servicio.precio or 0
+    )
+    messages.success(request, 'Recibo generado correctamente.')
+    return redirect('historial_reservas')
+
+@login_required(login_url='/login/')
+def ver_recibo(request, pk):
+    recibo = get_object_or_404(Recibo, pk=pk)
+    if recibo.reserva.usuario != request.user:
+        messages.error(request, 'No tienes permiso para ver este recibo.')
+        return redirect('historial_reservas')
+    return render(request, 'vista_socio_registrado/recibo.html', {'recibo': recibo})
+
+from django.http import HttpResponse  # Asegúrate de tener esta importación
+
+def descargar_recibo_pdf(request, pk):
+    from .models import Recibo
+    from django.template.loader import get_template
+    import weasyprint
+
+    recibo = Recibo.objects.get(pk=pk)
+    template = get_template('vista_socio_registrado/recibo.html')
+    html = template.render({'recibo': recibo, 'user': request.user})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="recibo_{recibo.pk}.pdf"'
+    weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response)
+    return response
+
+from .models import Empresa
+
+def admin_empresas_list(request):
+    empresas = Empresa.objects.all().order_by('nombre')
+    return render(request, 'adminview/empresas_list.html', {
+        'empresas': empresas,
+    })
+
+def mis_empresas(request):
+    empresas = Empresa.objects.filter(representante=request.user)
+    return render(request, 'vista_socio_registrado/mis_empresas.html', {
+        'empresas': empresas
     })

@@ -1,3 +1,4 @@
+/* Añade la paleta si no está */
 :root {
     --color-logo: #153D6C;
     --color-azul-brillante: #0367EC;
@@ -67,23 +68,28 @@ h2 {
 
 /* Header */
 .navbar-brand {
+    font-size: 1.5rem !important; /* Logo y texto más grande */
     font-weight: bold;
     color: var(--color-logo) !important;
 }
 
 .navbar-custom {
-    background-color: var(--color-blanco);
+    background-color: #153D6C !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 1.25rem; /* Aumenta tamaño de fuente del navbar */
 }
 
 .navbar-custom .navbar-nav .nav-link {
-    color: var(--color-logo);
+    color: #fff !important;
     font-weight: 500;
+    font-size: 1.18rem; /* Aumenta tamaño de los enlaces */
     transition: color 0.3s ease;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
 }
 
 .navbar-custom .navbar-nav .nav-link:hover {
-    color: var(--color-azul-brillante);
+    color: var(--color-amarillo-claro) !important;
 }
 
 /* Botones */
@@ -340,7 +346,7 @@ h2 {
 
 /* Dashboard */
 .dashboard-card {
-    background: linear-gradient(135deg, var(--color-azul-brillante), var(--color-logo));
+    background: #153D6C !important;
     color: var(--color-blanco);
     border-radius: 15px;
     padding: 30px;

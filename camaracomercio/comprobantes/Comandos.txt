@@ -1,6 +1,0 @@
------Crear un entorno virtual 
-python3 -m venv flask_env
------ACtivando el entorno
-source flask_env/bin/activate
------Crear un docuemto
-touch nombre.extencion

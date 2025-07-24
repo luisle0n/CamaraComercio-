@@ -1,12 +1,58 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Inicio Empresa{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Bienvenido, {{ user.first_name|default:user.username }}</h2>
-    <div class="alert alert-info text-center" style="font-size:1.15em;">
-        ¡Bienvenido al portal de empresas de la Cámara de Comercio de Loja!<br>
-        Aquí podrás gestionar la información de tu empresa, acceder a servicios, convenios y recibir notificaciones importantes.<br>
-        Usa el menú superior para navegar por las distintas opciones disponibles para empresas.
+    <div class="convenio-card mb-4" style="max-width:700px;">
+        <h1>¡Bienvenido, {{ user.first_name|default:user.username }}!</h1>
+        <div class="convenio-divider"></div>
+        <div class="mb-3" style="font-size:1.18em;">
+            <span class="badge bg-success mb-2" style="font-size:1em;">EMPRESA ACTIVA</span>
+            <p>
+                Estás en el portal de empresas de la <strong>Cámara de Comercio de Loja</strong>.<br>
+                Aquí puedes gestionar la información de tu empresa, acceder a servicios exclusivos, convenios y recibir notificaciones importantes.
+            </p>
+        </div>
+        <div class="row text-center mb-3">
+            <div class="col-6 col-md-3 mb-3">
+                <div style="font-size:2.2rem;color:var(--color-logo);"><i class="fas fa-building"></i></div>
+                <div style="font-weight:600;">Mi Empresa</div>
+                <div style="font-size:0.98em;color:var(--color-gris);">Gestiona tus datos y contactos</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div style="font-size:2.2rem;color:var(--color-azul-brillante);"><i class="fas fa-handshake"></i></div>
+                <div style="font-weight:600;">Convenios</div>
+                <div style="font-size:0.98em;color:var(--color-gris);">Accede a beneficios exclusivos</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div style="font-size:2.2rem;color:var(--color-dorado);"><i class="fas fa-bell"></i></div>
+                <div style="font-weight:600;">Notificaciones</div>
+                <div style="font-size:0.98em;color:var(--color-gris);">Mantente informado</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div style="font-size:2.2rem;color:#28a745;"><i class="fas fa-cogs"></i></div>
+                <div style="font-weight:600;">Servicios</div>
+                <div style="font-size:0.98em;color:var(--color-gris);">Solicita y administra servicios</div>
+            </div>
+        </div>
+        <div class="alert alert-info text-center mt-4" style="font-size:1.08em;">
+            <i class="fas fa-info-circle me-2"></i>
+            Usa el menú superior para navegar por las distintas opciones disponibles para empresas.
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="dashboard-card mb-4">
+                <h3>¿Sabías que...?</h3>
+                <p>
+                    Como empresa afiliada puedes acceder a <span style="color:var(--color-dorado);font-weight:600;">descuentos especiales</span> en convenios, publicar tus servicios y recibir notificaciones personalizadas.<br>
+                    <span style="color:var(--color-logo);font-weight:600;">¡Aprovecha todos los beneficios de ser parte de la Cámara!</span>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

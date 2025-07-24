@@ -1,16 +1,24 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Notificaciones Empresa{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Notificaciones</h2>
-    <ul class="list-group">
+    <div class="afiliados-section-title mb-4">Notificaciones</div>
+    <div class="notificaciones-list">
         {% for notificacion in notificaciones %}
-        <li class="list-group-item">
-            {{ notificacion.mensaje }} <span class="text-muted float-end">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</span>
-        </li>
+        <div class="notificacion-card">
+            <span class="notificacion-icon"><i class="fas fa-bell"></i></span>
+            <div class="notificacion-content">
+                <div class="notificacion-mensaje">{{ notificacion.mensaje }}</div>
+                <div class="notificacion-fecha">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</div>
+            </div>
+        </div>
         {% empty %}
-        <li class="list-group-item">No tienes notificaciones.</li>
+        <div class="alert alert-info text-center">No tienes notificaciones.</div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}

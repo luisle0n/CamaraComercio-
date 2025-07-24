@@ -1,52 +1,123 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Mis Reservas{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Mis Reservas</h2>
-    {% if reservas %}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Servicio</th>
-                <th>Fecha y Hora</th>
-                <th>Estado</th>
-                <th>Recibo</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reserva in reservas %}
-            <tr>
-                <td>{{ reserva.servicio.nombre }}</td>
-                <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <span class="badge 
-                        {% if reserva.estado == 'pendiente' %}bg-warning
-                        {% elif reserva.estado == 'confirmada' %}bg-success
-                        {% elif reserva.estado == 'cancelada' %}bg-danger
-                        {% endif %}">
-                        {{ reserva.get_estado_display }}
-                    </span>
-                </td>
-                <td>
-                    {% if reserva.estado == 'confirmada' %}
-                        {% if reserva.recibo %}
-                            <a href="{% url 'ver_recibo' reserva.recibo.pk %}" class="btn btn-info btn-sm">Ver recibo</a>
-                        {% else %}
-                            <form method="post" action="{% url 'generar_recibo' reserva.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-sm">Generar recibo</button>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <span class="text-muted">No disponible</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="alert alert-info text-center">No tienes reservas registradas.</div>
-    {% endif %}
+    <div class="reservas-usuario-card mb-4">
+        <div class="reservas-usuario-header">
+            <div class="reservas-usuario-avatar">
+                {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <div class="reservas-usuario-nombre">
+                    {{ user.first_name|default:user.username }}
+                </div>
+                <div class="reservas-usuario-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <h2 class="mb-4" style="color:var(--color-logo);font-size:2rem;">Mis Reservas</h2>
+        {% if reservas %}
+        <div class="table-responsive">
+            <table class="reservas-table w-100">
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Fecha y Hora</th>
+                        <th>Estado</th>
+                        <th>Recibo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.servicio.nombre }}</td>
+                        <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if reserva.estado == 'pendiente' %}bg-warning
+                                {% elif reserva.estado == 'confirmada' %}bg-success
+                                {% elif reserva.estado == 'cancelada' %}bg-danger
+                                {% endif %}">
+                                {{ reserva.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if reserva.estado == 'confirmada' %}
+                                {% if reserva.recibo %}
+                                    <button type="button"
+                                            class="btn btn-info btn-sm btn-ver-recibo"
+                                            data-recibo-id="{{ reserva.recibo.pk }}"
+                                            data-servicio="{{ reserva.servicio.nombre }}"
+                                            data-fecha="{{ reserva.fecha_reserva|date:'d/m/Y H:i' }}"
+                                            data-total="{{ reserva.recibo.total }}"
+                                            data-emision="{{ reserva.recibo.fecha_emision|date:'d/m/Y H:i' }}">
+                                        Ver recibo
+                                    </button>
+                                {% else %}
+                                    <form method="post" action="{% url 'generar_recibo' reserva.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Generar recibo</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">No disponible</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center mt-4">No tienes reservas registradas.</div>
+        {% endif %}
+    </div>
 </div>
+
+<!-- Modal recibo -->
+<div id="modalRecibo">
+    <div class="modal-content">
+        <button class="close-modal" onclick="cerrarRecibo()" title="Cerrar">&times;</button>
+        <h4 style="color:var(--color-logo);font-weight:700;">Recibo de Reserva</h4>
+        <div id="reciboDetalle" style="margin-top:18px;">
+            <!-- Aquí se carga el recibo -->
+        </div>
+    </div>
+</div>
+<script>
+function cerrarRecibo() {
+    document.getElementById('modalRecibo').style.display = 'none';
+    document.getElementById('reciboDetalle').innerHTML = '';
+}
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-ver-recibo').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const servicio = btn.getAttribute('data-servicio');
+            const fecha = btn.getAttribute('data-fecha');
+            const total = btn.getAttribute('data-total');
+            const emision = btn.getAttribute('data-emision');
+            const reciboId = btn.getAttribute('data-recibo-id');
+            let html = `
+                <div style="font-size:1.08rem;">
+                    <div><strong>Servicio:</strong> ${servicio}</div>
+                    <div><strong>Fecha de reserva:</strong> ${fecha}</div>
+                    <div><strong>Fecha de emisión:</strong> ${emision}</div>
+                    <div><strong>Total:</strong> $${total}</div>
+                    <div class="mt-3">
+                        ${reciboId ? `<a href="/descargar-recibo/${reciboId}/" target="_blank" class="btn btn-primary btn-sm">Descargar PDF</a>` : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('reciboDetalle').innerHTML = html;
+            document.getElementById('modalRecibo').style.display = 'flex';
+        });
+    });
+    document.getElementById('modalRecibo').addEventListener('click', function(e) {
+        if (e.target === this) cerrarRecibo();
+    });
+});
+</script>
 {% endblock %}

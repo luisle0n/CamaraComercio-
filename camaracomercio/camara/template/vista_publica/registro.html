@@ -1,16 +1,65 @@
 {% extends "master.html" %}
 {% load static %}
 {% block title %}Registro de Usuario{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/Formularios.css' %}">
+<style>
+    /* Estilo adicional para presentación profesional */
+    .registro-card {
+        background: var(--color-blanco);
+        border-radius: 32px;
+        box-shadow: 0 8px 32px rgba(21,61,108,0.13);
+        padding: 48px 38px;
+        max-width: 800px;
+        margin: 48px auto;
+        position: relative;
+    }
+    .registro-card h2 {
+        color: var(--color-logo);
+        font-size: 2.6rem;
+        font-weight: bold;
+        margin-bottom: 32px;
+        letter-spacing: 1px;
+    }
+    .registro-card .form-label {
+        color: var(--color-logo);
+        font-weight: 600;
+        font-size: 1.15rem;
+    }
+    .registro-card .btn-success {
+        font-size: 1.18rem;
+        padding: 14px 0;
+        border-radius: 14px;
+        font-weight: 600;
+        background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+        border: none;
+        box-shadow: 0 2px 8px rgba(21,61,108,0.10);
+        transition: background 0.3s;
+    }
+    .registro-card .btn-success:hover {
+        background: linear-gradient(90deg, var(--color-logo), var(--color-azul-brillante));
+    }
+    @media (max-width: 900px) {
+        .registro-card {
+            padding: 24px 8px;
+            max-width: 98vw;
+        }
+        .registro-card h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:1100px;">
-    <h2 class="mb-4 text-center">Registro de Usuario</h2>
+<div class="registro-card">
+    <h2 class="text-center mb-4">Solicitud de Afiliación</h2>
     <form method="post" enctype="multipart/form-data" id="registro-form">
         {% csrf_token %}
-        <div class="mb-3">
+        <div class="mb-4">
             <label for="tipo_usuario" class="form-label">Tipo de Usuario</label>
             <select class="form-select" id="tipo_usuario" name="tipo_usuario" required>
                 <option value="persona" {% if tipo == 'persona' %}selected{% endif %}>Natural</option>
-                <option value="empresa" {% if tipo == 'empresa' %}selected{% endif %}>Juridica</option>
+                <option value="empresa" {% if tipo == 'empresa' %}selected{% endif %}>Jurídica</option>
             </select>
         </div>
         <div id="persona-campos" class="campos-expandidos" {% if tipo != 'persona' %}style="display:none;"{% endif %}>
@@ -103,7 +152,7 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-success w-100">Registrarse</button>
+        <button type="submit" class="btn btn-success w-100 mt-4">Registrarse</button>
     </form>
 </div>
 {% endblock %}

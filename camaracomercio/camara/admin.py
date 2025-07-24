@@ -19,8 +19,15 @@ class AfiliacionNaturalAdmin(admin.ModelAdmin):
 
 @admin.register(AfiliacionJuridica)
 class AfiliacionJuridicaAdmin(admin.ModelAdmin):
-    list_display = ('razon_social', 'nombre_comercial_o_nombres', 'ruc_o_cedula', 'correo_electronico', 'estado', 'fecha_solicitud')
-    search_fields = ('razon_social', 'nombre_comercial_o_nombres', 'ruc_o_cedula', 'correo_electronico')
+    list_display = (
+        'nombre_comercial_o_nombres',  # <-- primero
+        'razon_social',
+        'ruc_o_cedula',
+        'correo_electronico',
+        'estado',
+        'fecha_solicitud'
+    )
+    search_fields = ('nombre_comercial_o_nombres', 'razon_social', 'ruc_o_cedula', 'correo_electronico')
     list_filter = ('estado',)
 
 @admin.register(Empresa)

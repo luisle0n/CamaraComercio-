@@ -1,0 +1,17 @@
+{% extends "master.html" %}
+{% block title %}Eliminar Beneficio{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:500px;">
+    <h2 class="mb-4">Eliminar Beneficio de {{ convenio.nombre }}</h2>
+    <div class="alert alert-danger">
+        ¿Estás seguro que deseas eliminar este beneficio?
+        <br>
+        <strong>{{ beneficio.descripcion }}</strong>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger w-100">Eliminar</button>
+        <a href="{% url 'admin_convenios_list' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import AfiliacionNatural, AfiliacionJuridica
+from .models import AfiliacionNatural, AfiliacionJuridica, Convenio, Beneficio, Servicio, Empresa
 
 class AfiliacionNaturalForm(forms.ModelForm):
     class Meta:
@@ -72,4 +72,84 @@ class AfiliacionJuridicaForm(forms.ModelForm):
         if piso and not piso.isdigit():
             raise forms.ValidationError("El campo 'Piso' debe contener solo números.")
         return piso
+
+class ConvenioForm(forms.ModelForm):
+    class Meta:
+        model = Convenio
+        fields = [
+            'nombre',
+            'descripcion',
+            'imagen',
+            'fecha_fin',
+            'categoria',
+            'tiene_descuento',
+            'porcentaje_descuento',
+        ]
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del convenio'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Descripción del convenio'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'categoria': forms.Select(attrs={'class': 'form-select'}),
+            'tiene_descuento': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100', 'placeholder': 'Ej: 10.00'}),
+        }
+
+class ConvenioEditForm(forms.ModelForm):
+    class Meta:
+        model = Convenio
+        fields = [
+            'nombre',
+            'descripcion',
+            'imagen',
+            'fecha_fin',
+            'categoria',
+            'tiene_descuento',
+            'porcentaje_descuento',
+        ]
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del convenio'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Descripción del convenio'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'categoria': forms.Select(attrs={'class': 'form-select'}),
+            'tiene_descuento': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100', 'placeholder': 'Ej: 10.00'}),
+        }
+
+class BeneficioForm(forms.ModelForm):
+    class Meta:
+        model = Beneficio
+        fields = ['descripcion']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Describe el beneficio que ofrece este convenio'
+            }),
+        }
+
+class ServicioForm(forms.ModelForm):
+    class Meta:
+        model = Servicio
+        fields = ['nombre', 'descripcion', 'precio', 'imagen']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del servicio'}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01', 'placeholder': 'Precio'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+class EmpresaForm(forms.ModelForm):
+    class Meta:
+        model = Empresa
+        fields = ['nombre', 'direccion', 'telefono', 'tipo_negocio', 'ruc', 'representante']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la empresa'}),
+            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Dirección'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
+            'tipo_negocio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo de negocio'}),
+            'ruc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'RUC'}),
+            'representante': forms.Select(attrs={'class': 'form-select'}),
+        }
 

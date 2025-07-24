@@ -1,0 +1,241 @@
+/* Paleta Cámara de Comercio de Loja */
+:root {
+    --color-logo: #153D6C;
+    --color-azul-brillante: #0367EC;
+    --color-dorado: #B48314;
+    --color-amarillo-claro: #F1DB62;
+    --color-blanco: #FFFFFF;
+    --color-gris-claro: #F8F9FA;
+    --color-gris: #6C757D;
+    --color-oscuro: #212529;
+}
+
+/* Estilo general del formulario */
+#registro-form {
+    background: var(--color-blanco);
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(21,61,108,0.10);
+    padding: 40px 32px;
+    margin: 0 auto 40px auto;
+    max-width: 750px;
+}
+
+#registro-form label,
+#registro-form .form-label {
+    font-size: 1.13rem;
+    color: var(--color-logo);
+    font-weight: 600;
+    margin-bottom: 7px;
+    letter-spacing: 0.2px;
+}
+
+#registro-form .form-control,
+#registro-form input[type="text"],
+#registro-form input[type="number"],
+#registro-form input[type="date"],
+#registro-form input[type="file"],
+#registro-form textarea,
+#registro-form select {
+    border-radius: 12px;
+    border: 2px solid var(--color-gris);
+    background: var(--color-gris-claro);
+    font-size: 1.11rem;
+    padding: 13px 15px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s, background 0.3s;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+#registro-form input[type="text"]:focus,
+#registro-form input[type="number"]:focus,
+#registro-form input[type="date"]:focus,
+#registro-form input[type="file"]:focus,
+#registro-form textarea:focus,
+#registro-form select:focus {
+    border-color: var(--color-logo);
+    background: var(--color-blanco);
+    outline: none;
+}
+
+#registro-form .form-text {
+    color: var(--color-gris);
+    font-size: 0.97em;
+    margin-bottom: 10px;
+}
+
+#registro-form .form-check-input[type="radio"] {
+    accent-color: var(--color-azul-brillante);
+    width: 1.2em;
+    height: 1.2em;
+}
+
+#registro-form .form-check-input[type="checkbox"] {
+    accent-color: var(--color-azul-brillante);
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 8px;
+}
+
+#registro-form .form-check-label {
+    font-weight: 500;
+    color: var(--color-logo);
+    font-size: 1.01rem;
+    cursor: pointer;
+}
+
+#registro-form .btn-success {
+    font-size: 1.15rem;
+    padding: 14px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+    border: none;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.10);
+    transition: background 0.3s;
+}
+
+#registro-form .btn-success:hover {
+    background: linear-gradient(90deg, var(--color-logo), var(--color-azul-brillante));
+}
+
+#registro-form .btn-info {
+    background: var(--color-dorado);
+    border: none;
+    color: var(--color-blanco);
+    font-weight: 600;
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+#registro-form .btn-info:hover {
+    background: #9a6f11;
+    color: var(--color-blanco);
+}
+
+#registro-form .btn-secondary {
+    background: var(--color-logo);
+    border: none;
+    color: var(--color-blanco);
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+#registro-form .modal-header.bg-primary {
+    background: var(--color-logo) !important;
+    color: var(--color-blanco) !important;
+}
+
+#registro-form .modal-footer .btn-success {
+    background: linear-gradient(90deg, var(--color-azul-brillante), var(--color-logo));
+    border: none;
+}
+
+#registro-form .modal-footer .btn-success:hover {
+    background: linear-gradient(90deg, var(--color-logo), var(--color-azul-brillante));
+}
+
+#registro-form .modal-footer .btn-secondary {
+    background: var(--color-logo);
+    border: none;
+    color: var(--color-blanco);
+}
+
+#registro-form input[type="file"].form-control {
+    padding: 10px;
+    font-size: 1rem;
+    background: var(--color-gris-claro);
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+}
+
+#registro-form .text-danger {
+    font-size: 0.97em;
+    margin-top: -12px;
+    margin-bottom: 8px;
+}
+
+/* Etiquetas de sección expandida */
+.campos-expandidos {
+    background: var(--color-blanco);
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(21,61,108,0.10);
+    padding: 32px 24px;
+    margin-bottom: 40px;
+}
+
+.campos-expandidos .form-label,
+.campos-expandidos label {
+    font-weight: 600;
+    color: var(--color-logo);
+    margin-bottom: 8px;
+    font-size: 1.08rem;
+}
+
+.campos-expandidos .form-control,
+.campos-expandidos input,
+.campos-expandidos select,
+.campos-expandidos textarea {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    transition: border-color 0.3s;
+    font-size: 1.05rem;
+    background: var(--color-gris-claro);
+    color: var(--color-oscuro);
+}
+
+.campos-expandidos .form-control:focus,
+.campos-expandidos input:focus,
+.campos-expandidos select:focus,
+.campos-expandidos textarea:focus {
+    border-color: var(--color-azul-brillante);
+    box-shadow: 0 0 0 0.2rem rgba(3, 103, 236, 0.13);
+    background: var(--color-blanco);
+}
+
+/* Botón para agregar beneficios */
+.add-beneficio-btn {
+    background: var(--color-logo);
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px auto;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(21,61,108,0.10);
+    cursor: pointer;
+}
+
+.add-beneficio-btn:hover, .add-beneficio-btn:focus {
+    background: var(--color-azul-brillante);
+    color: var(--color-blanco);
+    outline: none;
+    box-shadow: 0 4px 16px rgba(3,103,236,0.13);
+}
+
+/* Centrado y separación para el botón "+" */
+#add-beneficio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #registro-form {
+        padding: 18px 6px;
+        max-width: 100%;
+    }
+    .campos-expandidos {
+        padding: 18px 6px;
+    }
+}
