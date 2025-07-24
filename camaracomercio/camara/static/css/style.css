@@ -118,9 +118,9 @@ h2 {
 }
 
 .btn-warning {
-    background-color: var(--color-amarillo-claro);
-    border-color: var(--color-amarillo-claro);
-    color: var(--color-oscuro);
+    background-color: var(--color-amarillo-oscuro);
+    border-color: var(--color-amarillo-oscuro);
+    color: var(--color-claro);
 }
 
 .btn-warning:hover {
