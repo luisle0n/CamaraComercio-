@@ -124,8 +124,14 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAdmin" role="button"
                             data-bs-toggle="dropdown">
-                            <i class="fas fa-user-shield me-1"></i>{{
-                            user.nombre|default:user.first_name|default:user.username }}
+                            <i class="fas fa-user-shield me-1"></i>
+                            {% if user.nombre %}
+                            {{ user.nombre }}
+                            {% elif user.first_name %}
+                            {{ user.first_name }}
+                            {% else %}
+                            {{ user.username }}
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/admin/">Panel Admin</a></li>
@@ -140,8 +146,14 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-1"></i>{{ user.nombre|default:user.first_name|default:user.username
-                            }}
+                            <i class="fas fa-user me-1"></i>
+                            {% if user.nombre %}
+                            {{ user.nombre }}
+                            {% elif user.first_name %}
+                            {{ user.first_name }}
+                            {% else %}
+                            {{ user.username }}
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'perfil_usuario' %}">Mi Perfil</a></li>
