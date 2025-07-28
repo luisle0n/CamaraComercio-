@@ -1,5 +1,5 @@
 from django import forms
-from .models import AfiliacionNatural, AfiliacionJuridica, Convenio, Beneficio, Servicio, Empresa
+from .models import AfiliacionNatural, AfiliacionJuridica, Convenio, Beneficio, Servicio, Empresa, SolicitudVida
 
 class AfiliacionNaturalForm(forms.ModelForm):
     class Meta:
@@ -151,5 +151,36 @@ class EmpresaForm(forms.ModelForm):
             'tipo_negocio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo de negocio'}),
             'ruc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'RUC'}),
             'representante': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+class ReservaServicioForm(forms.Form):
+    fecha_reserva = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+        label="Fecha y Hora",
+        required=True
+    )
+
+class SolicitudVidaForm(forms.ModelForm):
+    class Meta:
+        model = SolicitudVida
+        exclude = ['usuario', 'fecha_solicitud']
+        widgets = {
+            'estado_civil': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'ocupacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'es_empleado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'otros_seguros': forms.TextInput(attrs={'class': 'form-control'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'estatura': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'tension_arterial': forms.TextInput(attrs={'class': 'form-control'}),
+            'consume_alcohol': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'fuma': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'usa_drogas': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'deportes': forms.TextInput(attrs={'class': 'form-control'}),
+            'beneficiarios': forms.TextInput(attrs={'class': 'form-control'}),
+            'detalles_salud': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 

@@ -29,16 +29,11 @@
             <img src="{{ servicio.imagen.url }}" alt="Imagen del servicio" style="max-width:220px;max-height:160px;border-radius:12px;box-shadow:0 2px 8px rgba(21,61,108,0.10);">
         </div>
         {% endif %}
-    </div>
-    <div class="convenio-card">
-        <h1>Reservar Servicio</h1>
         <div class="convenio-divider"></div>
         <form method="post" id="registro-form">
             {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label">Servicio</label>
-                <input type="text" class="form-control" value="{{ servicio.nombre }}" readonly>
-            </div>
+            <!-- Campo oculto para el servicio, solo para referencia si lo necesitas en el POST -->
+            <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
             <div class="mb-3">
                 <label for="fecha_reserva" class="form-label">Fecha y Hora</label>
                 <input type="datetime-local" class="form-control" id="fecha_reserva" name="fecha_reserva" required>
@@ -48,4 +43,5 @@
     </div>
 </div>
 {% endblock %}
+
 

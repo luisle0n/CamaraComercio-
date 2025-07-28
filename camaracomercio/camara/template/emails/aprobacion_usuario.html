@@ -1,20 +1,40 @@
 <!-- Este es el template para el correo de aprobación de usuario -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Credenciales de acceso</title>
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
 </head>
-<body>
-    <h2>¡Bienvenido a la Cámara de Comercio!</h2>
-    <p>Tu cuenta ha sido aprobada. Puedes iniciar sesión en el sistema con las siguientes credenciales:</p>
-    <ul>
-        <li><strong>Usuario (correo):</strong> {{ correo_login }}</li>
-        <li><strong>Contraseña temporal:</strong> {{ temp_password }}</li>
-    </ul>
-    <p>Por seguridad, deberás cambiar tu contraseña en tu primer ingreso.</p>
-    <p>Si tienes dudas, comunícate con el administrador.</p>
-    <br>
-    <p>Atentamente,<br>Equipo Cámara de Comercio</p>
+<body class="email-bg">
+    <div class="email-preview-card">
+        <div class="email-logo">
+            <img src="https://camaradecomercioloja.com/wp-content/uploads/2023/01/Objeto-inteligente-vectorial-1.png" alt="Cámara de Comercio de Loja">
+        </div>
+        <h2>¡Bienvenido a la Cámara de Comercio!</h2>
+        <p class="email-bienvenida">
+            Tu cuenta ha sido <span style="color:#28a745; font-weight:600;">aprobada</span>. Puedes iniciar sesión en el sistema con las siguientes credenciales:
+        </p>
+        <ul class="email-credenciales">
+            <li>
+                <span class="email-label">Usuario (correo):</span>
+                <span class="correo">{{ correo_login }}</span>
+            </li>
+            <li>
+                <span class="email-label">Contraseña temporal:</span>
+                <span class="password">{{ temp_password }}</span>
+            </li>
+        </ul>
+        <p class="email-seguridad">
+            <strong style="color:#B48314;">Por seguridad</strong>, deberás cambiar tu contraseña en tu primer ingreso.
+        </p>
+        <p class="email-ayuda">
+            Si tienes dudas, comunícate con el administrador.
+        </p>
+        <div class="email-footer">
+            Atentamente,<br>Equipo Cámara de Comercio
+        </div>
+    </div>
 </body>
 </html>

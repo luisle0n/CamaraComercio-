@@ -116,6 +116,90 @@
     color: var(--color-blanco);
 }
 
+/* Fondo para emails */
+.email-bg {
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos para vista previa de correos bonitos */
+.email-preview-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 18px rgba(21,61,108,0.13);
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 38px 28px 28px 28px;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+.email-logo {
+    text-align: center;
+    margin-bottom: 18px;
+}
+.email-logo img {
+    width: 90px;
+    height: auto;
+    margin-bottom: 10px;
+}
+.email-preview-card h2 {
+    color: #153D6C;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 18px;
+    text-align: center;
+}
+.email-bienvenida {
+    font-size: 1.08rem;
+    color: #222;
+    margin-bottom: 18px;
+    text-align: center;
+}
+.email-credenciales {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+}
+.email-credenciales li {
+    margin-bottom: 10px;
+}
+.email-label {
+    color: #153D6C;
+    font-weight: 600;
+}
+.correo {
+    background: #f1db62;
+    color: #153D6C;
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-weight: 500;
+}
+.password {
+    background: #0367EC;
+    color: #fff;
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-weight: 500;
+}
+.email-seguridad {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.email-ayuda {
+    font-size: 0.98rem;
+    color: #666;
+    text-align: center;
+}
+.email-footer {
+    margin-top: 30px;
+    text-align: center;
+    color: #153D6C;
+    font-weight: 600;
+    font-size: 1.08rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .registro-card {

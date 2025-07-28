@@ -7,7 +7,17 @@
 {% block content %}
 <div class="container mt-5">
     <div class="convenio-card mb-4" style="max-width:700px;">
-        <h1>¡Bienvenido, {{ user.first_name|default:user.username }}!</h1>
+        <h1>
+            ¡Bienvenido,
+            {% if user.nombre %}
+                {{ user.nombre }}
+            {% elif user.first_name %}
+                {{ user.first_name }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+            !
+        </h1>
         <div class="convenio-divider"></div>
         <div class="mb-3" style="font-size:1.18em;">
             <span class="badge bg-success mb-2" style="font-size:1em;">EMPRESA ACTIVA</span>
