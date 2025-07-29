@@ -30,7 +30,16 @@
                 <span class="discount-badge">{{ convenio.porcentaje_descuento }}% DESCUENTO</span>
                 {% endif %}
                 <div class="card-body text-center d-flex flex-column justify-content-between">
+                    {% if convenio.enlace %}
+                    <h5 class="card-title mt-2 fw-bold text-primary">
+                        <a href="{{ convenio.enlace }}" target="_blank" style="text-decoration:none;color:inherit;">
+                            {{ convenio.nombre }}
+                            <i class="fas fa-external-link-alt ms-1" style="font-size:0.9em;"></i>
+                        </a>
+                    </h5>
+                    {% else %}
                     <h5 class="card-title mt-2 fw-bold text-primary">{{ convenio.nombre }}</h5>
+                    {% endif %}
                     <span class="badge bg-light text-primary mb-2">
                         {{ convenio.get_categoria_display }}
                     </span>

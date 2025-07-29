@@ -202,6 +202,7 @@ class Convenio(models.Model):
     )
     tiene_descuento = models.BooleanField(default=False)  # Nuevo campo
     porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Nuevo campo
+    enlace = models.URLField("Enlace externo", null=True, blank=True)  # Nuevo campo
 
     def __str__(self):
         return f"{self.nombre} ({self.get_categoria_display()})"

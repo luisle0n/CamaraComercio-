@@ -84,6 +84,7 @@ class ConvenioForm(forms.ModelForm):
             'categoria',
             'tiene_descuento',
             'porcentaje_descuento',
+            'enlace',  # Añadido aquí
         ]
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del convenio'}),
@@ -93,6 +94,7 @@ class ConvenioForm(forms.ModelForm):
             'categoria': forms.Select(attrs={'class': 'form-select'}),
             'tiene_descuento': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100', 'placeholder': 'Ej: 10.00'}),
+            'enlace': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Enlace externo (opcional)'}),
         }
 
 class ConvenioEditForm(forms.ModelForm):
@@ -106,6 +108,7 @@ class ConvenioEditForm(forms.ModelForm):
             'categoria',
             'tiene_descuento',
             'porcentaje_descuento',
+            'enlace',  # Añadido aquí
         ]
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del convenio'}),
@@ -115,6 +118,7 @@ class ConvenioEditForm(forms.ModelForm):
             'categoria': forms.Select(attrs={'class': 'form-select'}),
             'tiene_descuento': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100', 'placeholder': 'Ej: 10.00'}),
+            'enlace': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Enlace externo (opcional)'}),
         }
 
 class BeneficioForm(forms.ModelForm):
