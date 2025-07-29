@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, JsonResponse
 import secrets
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm, ConvenioForm, ServicioForm, EmpresaForm, ReservaServicioForm, SolicitudVidaForm
 from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo, Notificacion
@@ -187,17 +187,23 @@ from .forms import EmpresaForm
 from .models import Empresa
 
 def registro_empresa(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    # Diferenciar por tipo de usuario para mostrar el template correcto
+    if getattr(request.user, 'tipo_usuario', None) == 'empresa':
+        template = 'vista_empresa/registroEmpresa.html'
+    else:
+        template = 'vista_socio_registrado/registroEmpresa.html'
     if request.method == 'POST':
         form = EmpresaForm(request.POST)
         if form.is_valid():
             empresa = form.save(commit=False)
             empresa.representante = request.user
             empresa.save()
-            # Cambia aquí la redirección a una URL válida, por ejemplo al home del usuario
-            return redirect('home')  # Usa el nombre de una URL existente, como 'home' o 'perfil_usuario'
+            return redirect('home')
     else:
         form = EmpresaForm(initial={'representante': request.user.pk})
-    return render(request, 'vista_socio_registrado/registroEmpresa.html', {
+    return render(request, template, {
         'form': form
     })
 
@@ -531,8 +537,22 @@ def admin_reserva_estado(request, pk):
         if nuevo_estado in dict(Reserva.ESTADO_CHOICES):
             reserva.estado = nuevo_estado
             reserva.save()
+            # AJAX: responder con JSON si es petición fetch
+            if request.headers.get('Accept') == 'application/json':
+                badge_class = (
+                    'bg-warning' if nuevo_estado == 'pendiente'
+                    else 'bg-success' if nuevo_estado == 'confirmada'
+                    else 'bg-danger'
+                )
+                return JsonResponse({
+                    'success': True,
+                    'estado_display': reserva.get_estado_display(),
+                    'badge_class': badge_class
+                })
             messages.success(request, 'Estado de la reserva actualizado.')
         else:
+            if request.headers.get('Accept') == 'application/json':
+                return JsonResponse({'success': False, 'error': 'Estado inválido'})
             messages.error(request, 'Estado inválido.')
         return redirect('admin_reservas_list')
     return render(request, 'adminview/reserva_estado_form.html', {'reserva': reserva})
@@ -765,5 +785,13 @@ def admin_empresas_list(request):
 def mis_empresas(request):
     empresas = Empresa.objects.filter(representante=request.user)
     return render(request, 'vista_socio_registrado/mis_empresas.html', {
+        'empresas': empresas
+    })
+
+def empresas_registradas(request):
+    if not request.user.is_authenticated or getattr(request.user, 'tipo_usuario', None) != 'empresa':
+        return redirect('login')
+    empresas = Empresa.objects.filter(representante=request.user)
+    return render(request, 'vista_empresa/empresas_registradas.html', {
         'empresas': empresas
     })

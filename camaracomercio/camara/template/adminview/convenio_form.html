@@ -1,9 +1,6 @@
 {% extends "master.html" %}
 {% load static %}
 {% block title %}{{ accion }} Convenio{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/admin.css' %}">
-{% endblock %}
 {% block content %}
 <div class="convenio-card">
     <h1>{{ accion }} Convenio</h1>
@@ -17,4 +14,3 @@
     </form>
 </div>
 {% endblock %}
- 

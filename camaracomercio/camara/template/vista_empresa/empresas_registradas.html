@@ -1,9 +1,8 @@
 {% extends "master.html" %}
-{% load static %}
-{% block title %}Empresas{% endblock %}
+{% block title %}Mis Empresas Registradas{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <div class="empresas-section-title mb-4">Empresas registradas</div>
+    <h2 class="mb-4">Mis Empresas Registradas</h2>
     <div class="empresas-card-group">
         <div class="row">
             {% for empresa in empresas %}
@@ -20,18 +19,14 @@
                     {% if empresa.tipo_negocio %}
                     <span class="text-muted">Tipo de negocio: {{ empresa.tipo_negocio }}</span>
                     {% endif %}
-                    {% if empresa.representante %}
-                    <span class="text-muted">Representante: {{ empresa.representante.nombre|default:empresa.representante.email }}</span>
-                    {% endif %}
                 </div>
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="empresa-item text-muted">No hay empresas registradas.</div>
+                <div class="empresa-item text-muted">No tienes empresas registradas.</div>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
 {% endblock %}
-

@@ -64,7 +64,7 @@
                             <tbody>
                                 {% for reserva in grupo.list %}
                                     {% if not request.GET.estado or reserva.estado == request.GET.estado %}
-                                    <tr>
+                                    <tr id="reserva-row-{{ reserva.pk }}">
                                         <td>
                                             {% if reserva.servicio %}
                                                 {{ reserva.servicio.nombre }}
@@ -78,12 +78,20 @@
                                                 {% if reserva.estado == 'pendiente' %}bg-warning
                                                 {% elif reserva.estado == 'confirmada' %}bg-success
                                                 {% elif reserva.estado == 'cancelada' %}bg-danger
-                                                {% endif %}">
+                                                {% endif %}" id="estado-badge-{{ reserva.pk }}">
                                                 {{ reserva.get_estado_display }}
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{% url 'admin_reserva_estado' reserva.pk %}" class="btn btn-primary btn-sm">Cambiar estado</a>
+                                            <form class="form-cambiar-estado d-inline" data-reserva-id="{{ reserva.pk }}">
+                                                {% csrf_token %}
+                                                <select name="estado" class="form-select form-select-sm d-inline w-auto" style="min-width:120px;">
+                                                    <option value="pendiente" {% if reserva.estado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                                                    <option value="confirmada" {% if reserva.estado == "confirmada" %}selected{% endif %}>Confirmada</option>
+                                                    <option value="cancelada" {% if reserva.estado == "cancelada" %}selected{% endif %}>Cancelada</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-primary btn-sm ms-1">Guardar</button>
+                                            </form>
                                         </td>
                                     </tr>
                                     {% endif %}
@@ -102,4 +110,37 @@
         <div class="alert alert-info text-center">No hay reservas registradas.</div>
     {% endfor %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.form-cambiar-estado').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const reservaId = form.getAttribute('data-reserva-id');
+            const select = form.querySelector('select[name="estado"]');
+            const estado = select.value;
+            const csrf = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+            fetch(`/admin-reservas/${reservaId}/cambiar-estado/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    'Accept': 'application/json',
+                },
+                body: new URLSearchParams({estado: estado})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualiza el badge de estado
+                    const badge = document.getElementById('estado-badge-' + reservaId);
+                    badge.textContent = data.estado_display;
+                    badge.className = 'badge ' + data.badge_class;
+                } else {
+                    alert(data.error || 'Error al cambiar el estado');
+                }
+            })
+            .catch(() => alert('Error de red al cambiar el estado'));
+        });
+    });
+});
+</script>
 {% endblock %}

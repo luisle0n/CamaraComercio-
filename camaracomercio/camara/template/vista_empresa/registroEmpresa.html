@@ -1,35 +1,20 @@
 {% extends "master.html" %}
+{% load static %}
 {% block title %}Registro de Empresa{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:600px;">
-    <h2 class="mb-4">Registro de Empresa</h2>
-    <form method="post">
+<div class="convenio-card">
+    <h1>Registro de Empresa</h1>
+    <div class="convenio-divider"></div>
+    <form method="post" id="registro-form">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre de la empresa</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" required>
-        </div>
-        <div class="mb-3">
-            <label for="direccion" class="form-label">Dirección</label>
-            <textarea class="form-control" id="direccion" name="direccion" rows="2"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="telefono" class="form-label">Teléfono</label>
-            <input type="text" class="form-control" id="telefono" name="telefono">
-        </div>
-        <div class="mb-3">
-            <label for="tipo_negocio" class="form-label">Tipo de negocio</label>
-            <input type="text" class="form-control" id="tipo_negocio" name="tipo_negocio">
-        </div>
-        <div class="mb-3">
-            <label for="ruc" class="form-label">RUC</label>
-            <input type="text" class="form-control" id="ruc" name="ruc" required>
-        </div>
-        <div class="mb-3">
-            <label for="representante" class="form-label">Representante (usuario)</label>
-            <input type="text" class="form-control" id="representante" name="representante" value="{{ user.email }}" readonly>
-        </div>
-        <button type="submit" class="btn btn-success w-100">Registrar empresa</button>
+        {{ form.non_field_errors }}
+        {{ form.representante.as_hidden }}
+        {{ form.nombre.label_tag }}{{ form.nombre }}
+        {{ form.direccion.label_tag }}{{ form.direccion }}
+        {{ form.telefono.label_tag }}{{ form.telefono }}
+        {{ form.tipo_negocio.label_tag }}{{ form.tipo_negocio }}
+        {{ form.ruc.label_tag }}{{ form.ruc }}
+        <button type="submit" class="convenio-btn w-100">Registrar Empresa</button>
     </form>
 </div>
 {% endblock %}

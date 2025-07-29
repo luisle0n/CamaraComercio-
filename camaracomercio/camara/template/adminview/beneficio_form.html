@@ -1,9 +1,6 @@
 {% extends "master.html" %}
 {% load static %}
 {% block title %}{% if beneficio %}Editar Beneficio{% else %}Añadir Beneficio{% endif %}{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/Formularios.css' %}">
-{% endblock %}
 {% block content %}
 <div class="container mt-5" style="max-width:600px;">
     <h2 class="mb-4">{% if beneficio %}Editar{% else %}Añadir{% endif %} Beneficio a {{ convenio.nombre }}</h2>
@@ -42,4 +39,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
  

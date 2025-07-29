@@ -1,12 +1,9 @@
 {% extends "master.html" %}
 {% load static %}
-{% block title %}Registro de Empresa{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/admin.css' %}">
-{% endblock %}
+{% block title %}Registro de Comercio{% endblock %}
 {% block content %}
 <div class="convenio-card">
-    <h1>Registro de Empresa</h1>
+    <h1>Registro de Comercio</h1>
     <div class="convenio-divider"></div>
     <form method="post" id="registro-form">
         {% csrf_token %}
@@ -18,8 +15,9 @@
         {{ form.telefono.label_tag }}{{ form.telefono }}
         {{ form.tipo_negocio.label_tag }}{{ form.tipo_negocio }}
         {{ form.ruc.label_tag }}{{ form.ruc }}
-        <button type="submit" class="convenio-btn w-100">Registrar empresa</button>
+        <button type="submit" class="convenio-btn w-100">Registrar Comercio</button>
     </form>
 </div>
 {% endblock %}
+
 
