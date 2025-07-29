@@ -2,12 +2,44 @@
 {% load static %}
 {% block title %}Solicitar Seguro de Vida{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:700px;">
+<div class="container mt-5" style="max-width:900px;">
     <h2 class="mb-4">Solicitar Seguro de Vida</h2>
     <form method="post" id="registro-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="convenio-btn w-100">Enviar solicitud</button>
+        <div class="row">
+            <!-- Campos normales en 3 columnas -->
+            {% for field in form %}
+                {% if field.name == "consume_alcohol" %}
+                    <div class="col-12 mb-2">
+                        <label class="form-label fw-bold">Adicciones:</label>
+                    </div>
+                {% endif %}
+                {% if field.name in "consume_alcohol fuma usa_drogas" %}
+                    <div class="col-md-4 mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% elif field.name not in "consume_alcohol fuma usa_drogas" %}
+                    <div class="col-md-4 mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button type="submit" class="convenio-btn w-100 mt-3">Enviar solicitud</button>
     </form>
 </div>
 {% endblock %}
