@@ -42,5 +42,6 @@ urlpatterns = [
     path('admin-empresas/', views.admin_empresas_list, name='admin_empresas_list'),
     path('mis-empresas/', views.mis_empresas, name='mis_empresas'),
     path('mis-empresas-empresa/', views.empresas_registradas, name='empresas_registradas'),
+    path('buscar-socio-cedula/', views.buscar_socio_cedula, name='buscar_socio_cedula'),
     path('descargar-recibo/<int:pk>/', views.descargar_recibo_pdf, name='descargar_recibo_pdf'),
 ]

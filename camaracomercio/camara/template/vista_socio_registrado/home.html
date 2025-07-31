@@ -2,6 +2,21 @@
 {% block title %}Inicio Socio{% endblock %}
 {% block content %}
 <div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="dashboard-card p-3">
+                <h3>Buscar Socio por Cédula</h3>
+                <form method="get" action="{% url 'buscar_socio_cedula' %}" class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <input type="text" name="cedula" class="form-control" placeholder="Ingrese la cédula" required maxlength="13">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <h2 class="mb-4">
         Bienvenido,
         {% if user.nombre %}

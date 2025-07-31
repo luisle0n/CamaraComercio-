@@ -1,7 +1,6 @@
 // Funciones principales del sitio
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar chatbot
-    initChatbot();
+    // Eliminar inicialización duplicada del chatbot para evitar errores en vistas públicas
     
     // Inicializar tooltips de Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -54,24 +53,17 @@ function initChatbot() {
             // Clear input
             chatbotInput.value = '';
             
-            // Send message to backend
-            fetch('/chatbot/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({mensaje: mensaje})
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Add bot response
-                addChatMessage(data.respuesta, 'bot');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                addChatMessage('Lo siento, hubo un error. Intenta nuevamente.', 'bot');
-            });
+            // Usar solo el JS local para responder
+            if (typeof getBotResponse === 'function') {
+                showTyping && showTyping();
+                setTimeout(function() {
+                    hideTyping && hideTyping();
+                    var respuesta = getBotResponse(mensaje);
+                    addChatMessage(respuesta, 'bot');
+                }, 900);
+            } else {
+                addChatMessage('No se pudo procesar la respuesta. Consulta con soporte.', 'bot');
+            }
         });
     }
     

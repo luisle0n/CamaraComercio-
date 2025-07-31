@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+{% block title %}Resultado de búsqueda de socio{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Resultado de búsqueda por cédula</h2>
+    {% if cedula %}
+        <p><strong>Cédula consultada:</strong> {{ cedula }}</p>
+    {% endif %}
+    {% if resultado %}
+        <div class="dashboard-card mb-4 p-4 shadow-sm" style="border-radius:16px;background:#f8f9fa;">
+            <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-user-circle fa-3x text-primary me-3"></i>
+                <div>
+                    <h4 class="mb-0">Socio encontrado</h4>
+                    <span class="badge bg-success ms-2" style="font-size:0.95rem;">{% if resultado.is_active %}Activo{% else %}Inactivo{% endif %}</span>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Nombre:</strong> {{ resultado.nombre|default:resultado.first_name }} {{ resultado.last_name }}</p>
+                    <p class="mb-1"><strong>Cédula:</strong> {{ resultado.cedula }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Email:</strong> {{ resultado.email }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> {{ resultado.telefono }}</p>
+                </div>
+            </div>
+        </div>
+    {% elif error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+        <div class="alert alert-info">Ingrese una cédula para buscar un socio.</div>
+    {% endif %}
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Volver al inicio</a>
+</div>
+{% endblock %}

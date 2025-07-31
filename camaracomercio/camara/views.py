@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Q
 from django.conf import settings
 from django.http import Http404, JsonResponse
 import secrets
@@ -274,6 +275,19 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+def buscar_socio_cedula(request):
+    cedula = request.GET.get('cedula', '').strip()
+    resultado = None
+    error = None
+    if cedula:
+        resultado = Usuario.objects.filter(Q(cedula=cedula) & Q(tipo_usuario='socio')).first()
+        if not resultado:
+            error = f"No se encontró ningún socio con la cédula {cedula}."
+    return render(request, 'vista_socio_registrado/buscar_socio_resultado.html', {
+        'cedula': cedula,
+        'resultado': resultado,
+        'error': error
+    })
 # Vistas de administración con permisos
 @permission_required('camara.view_afiliacionnatural', login_url='/login/')
 def admin_home(request):
