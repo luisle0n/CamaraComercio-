@@ -162,18 +162,6 @@ class AfiliacionJuridica(Afiliacion):
         return f"{self.razon_social[:20]} - {self.ruc_o_cedula} - {self.get_estado_display()}"
 ## ---
 
-class Empresa(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='empresa')
-    nombre = models.CharField(max_length=255)
-    direccion = models.TextField(null=True, blank=True)
-    telefono = models.CharField(max_length=20, null=True, blank=True)
-    tipo_negocio = models.CharField(max_length=100, null=True, blank=True)
-    ruc = models.CharField(max_length=20, unique=True)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.ruc})"
-
-
 class Servicio(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
@@ -214,17 +202,6 @@ class Beneficio(models.Model):
 
     def __str__(self):
         return self.descripcion if self.descripcion else "Beneficio sin descripción"
-
-
-class ContactoPrincipal(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
-    nombre = models.CharField(max_length=255, null=True, blank=True)
-    telefono = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.email})"
-
 
 class Credencial(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
@@ -337,14 +314,6 @@ class Recibo(models.Model):
 
     def __str__(self):
         return f"Recibo #{self.pk} - {self.total}"
-
-
-class ServicioProveedor(models.Model):
-    proveedor = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
-    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return f"{self.proveedor} - {self.servicio}"
 
 
 class SolicitudVida(models.Model):

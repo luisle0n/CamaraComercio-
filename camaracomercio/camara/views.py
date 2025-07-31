@@ -38,16 +38,6 @@ def get_user_group(user):
     return 'otro'
 
 def home(request):
-    # DEBUG: Verifica si la sesión realmente persiste tras login
-    print(f"[HOME] request.user: {request.user}")
-    print(f"[HOME] request.user.is_authenticated: {getattr(request.user, 'is_authenticated', None)}")
-    print(f"[HOME] sessionid: {request.COOKIES.get('sessionid')}")
-    print(f"[HOME] session keys: {list(request.session.keys())}")
-    print(f"[HOME] AUTH_USER_MODEL: {settings.AUTH_USER_MODEL}")
-    print(f"[HOME] user class: {type(request.user)}")
-    print(f"[HOME] _auth_user_id: {request.session.get('_auth_user_id', None)}")
-    print(f"[HOME] _auth_user_backend: {request.session.get('_auth_user_backend', None)}")
-
     if request.user.is_authenticated:
         # Si es su primer ingreso, fuerza cambio de contraseña
         if hasattr(request.user, 'debe_cambiar_contrasena') and request.user.debe_cambiar_contrasena:

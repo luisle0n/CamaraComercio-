@@ -1,8 +1,7 @@
 from django.contrib import admin
 from .models import (
-    Usuario, AfiliacionNatural, AfiliacionJuridica, Empresa, Servicio, Convenio, Beneficio,
-    ContactoPrincipal, Credencial, Documento, EmpresaConvenio, Notificacion,
-    Reserva, Recibo, ServicioProveedor, SolicitudVida
+    Usuario, AfiliacionNatural, AfiliacionJuridica, Empresa, Servicio, Convenio, Beneficio, Credencial, Documento, EmpresaConvenio, Notificacion,
+    Reserva, Recibo, SolicitudVida
 )
 
 @admin.register(Usuario)
@@ -61,12 +60,6 @@ class BeneficioAdmin(admin.ModelAdmin):
     search_fields = ('descripcion',)
     list_filter = ('convenio',)
 
-@admin.register(ContactoPrincipal)
-class ContactoPrincipalAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'telefono', 'email', 'usuario')
-    search_fields = ('nombre', 'email')
-    list_filter = ('usuario',)
-
 @admin.register(Credencial)
 class CredencialAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'ultimo_inicio_sesion')
@@ -102,12 +95,6 @@ class ReciboAdmin(admin.ModelAdmin):
     list_display = ('reserva', 'fecha_emision', 'total')
     search_fields = ('reserva__usuario__nombre',)
     list_filter = ('fecha_emision',)
-
-@admin.register(ServicioProveedor)
-class ServicioProveedorAdmin(admin.ModelAdmin):
-    list_display = ('proveedor', 'servicio')
-    search_fields = ('proveedor__nombre', 'servicio__nombre')
-    list_filter = ('proveedor', 'servicio')
 
 @admin.register(SolicitudVida)
 class SolicitudVidaAdmin(admin.ModelAdmin):
