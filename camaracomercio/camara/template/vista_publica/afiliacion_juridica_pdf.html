@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen Afiliación Jurídica</title>
+    <link rel="stylesheet" href="{% static 'css/Formularios.css' %}">
+    <style>
+        /* ...estilos personalizados para PDF... */
+        body {
+            background: #fff;
+            color: #153D6C;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 40px;
+        }
+        .pdf-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px rgba(21,61,108,0.10);
+            padding: 40px 28px;
+            margin-bottom: 40px;
+            max-width: 900px;
+            margin: auto;
+        }
+        .pdf-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #153D6C;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .pdf-section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #0367EC;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+        .pdf-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .pdf-col {
+            flex: 1 1 33%;
+            min-width: 220px;
+            margin-bottom: 12px;
+            padding-right: 18px;
+        }
+        .pdf-label {
+            font-weight: 600;
+            color: #153D6C;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .pdf-value {
+            color: #212529;
+            font-size: 1.08rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 6px 12px;
+            margin-bottom: 2px;
+        }
+        .pdf-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #6C757D;
+        }
+    </style>
+</head>
+<body>
+    <div class="pdf-card">
+        <div class="pdf-title">Resumen de Afiliación Jurídica</div>
+        <div class="pdf-section-title">Datos de la Empresa</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Razón social</span>
+                <span class="pdf-value">{{ afiliacion.razon_social }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Nombre comercial</span>
+                <span class="pdf-value">{{ afiliacion.nombre_comercial_o_nombres }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">RUC</span>
+                <span class="pdf-value">{{ afiliacion.ruc_o_cedula }}</span>
+            </div>
+        </div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Correo empresa</span>
+                <span class="pdf-value">{{ afiliacion.correo_empresa }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Teléfonos</span>
+                <span class="pdf-value">
+                    {{ afiliacion.telefono1 }}
+                    {% if afiliacion.telefono2 %}, {{ afiliacion.telefono2 }}{% endif %}
+                    {% if afiliacion.telefono3 %}, {{ afiliacion.telefono3 }}{% endif %}
+                    {% if afiliacion.celular %}, Celular: {{ afiliacion.celular }}{% endif %}
+                </span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Actividad económica</span>
+                <span class="pdf-value">{{ afiliacion.actividad_economica }}</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Representante Legal</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Cédula/Pasaporte</span>
+                <span class="pdf-value">{{ afiliacion.rep_legal_cedula_pasaporte }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Apellidos</span>
+                <span class="pdf-value">{{ afiliacion.rep_legal_apellido1 }} {{ afiliacion.rep_legal_apellido2 }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Nombres</span>
+                <span class="pdf-value">{{ afiliacion.rep_legal_nombres }}</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Dirección</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Dirección principal</span>
+                <span class="pdf-value">{{ afiliacion.direccion_principal }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Calle</span>
+                <span class="pdf-value">{{ afiliacion.calle }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Número</span>
+                <span class="pdf-value">{{ afiliacion.numero }}</span>
+            </div>
+        </div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Intersección</span>
+                <span class="pdf-value">{{ afiliacion.calle_interseccion }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Referencia</span>
+                <span class="pdf-value">{{ afiliacion.referencia }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Edificio</span>
+                <span class="pdf-value">{{ afiliacion.edificio }}</span>
+            </div>
+        </div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Piso</span>
+                <span class="pdf-value">{{ afiliacion.piso }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Oficina</span>
+                <span class="pdf-value">{{ afiliacion.oficina }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Parroquia</span>
+                <span class="pdf-value">{{ afiliacion.parroquia }}</span>
+            </div>
+        </div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Ciudad</span>
+                <span class="pdf-value">{{ afiliacion.ciudad }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">País</span>
+                <span class="pdf-value">{{ afiliacion.pais }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Página web</span>
+                <span class="pdf-value">{{ afiliacion.pagina_web }}</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Contacto</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Correo jurídico</span>
+                <span class="pdf-value">{{ afiliacion.contacto_juridico_correo }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Teléfono jurídico</span>
+                <span class="pdf-value">{{ afiliacion.contacto_juridico_telefono }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Correo natural</span>
+                <span class="pdf-value">{{ afiliacion.contacto_natural_correo }}</span>
+            </div>
+        </div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Teléfono natural</span>
+                <span class="pdf-value">{{ afiliacion.contacto_natural_telefono }}</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Titular</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Nombre</span>
+                <span class="pdf-value">{{ afiliacion.titular_nombre }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Teléfono</span>
+                <span class="pdf-value">{{ afiliacion.titular_telefono }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Fecha de nacimiento</span>
+                <span class="pdf-value">{{ afiliacion.titular_fecha_nacimiento }}</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Cédula</span>
+                <span class="pdf-value">{{ afiliacion.titular_cedula }}</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Beneficiarios</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Beneficiario 1</span>
+                <span class="pdf-value">{{ afiliacion.beneficiario1_nombre }} ({{ afiliacion.beneficiario1_porcentaje }}%)</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Beneficiario 2</span>
+                <span class="pdf-value">{{ afiliacion.beneficiario2_nombre }} ({{ afiliacion.beneficiario2_porcentaje }}%)</span>
+            </div>
+            <div class="pdf-col">
+                <span class="pdf-label">Beneficiario 3</span>
+                <span class="pdf-value">{{ afiliacion.beneficiario3_nombre }} ({{ afiliacion.beneficiario3_porcentaje }}%)</span>
+            </div>
+        </div>
+        <div class="pdf-section-title">Firma</div>
+        <div class="pdf-row">
+            <div class="pdf-col">
+                <span class="pdf-label">Firma digital</span>
+                <span class="pdf-value">{{ afiliacion.firma }}</span>
+            </div>
+        </div>
+        <div class="pdf-footer">
+            <strong>Fecha de solicitud:</strong> {{ afiliacion.fecha_solicitud|date:"d/m/Y H:i" }}<br>
+            <strong>Estado:</strong> {{ afiliacion.get_estado_display }}
+        </div>
+    </div>
+</body>
+</html>
