@@ -6,8 +6,9 @@ from django.db.models import Q
 from django.conf import settings
 from django.http import Http404, JsonResponse
 import secrets
+from django.contrib.auth import get_user_model
 from .forms import AfiliacionNaturalForm, AfiliacionJuridicaForm, ConvenioForm, ServicioForm, EmpresaForm, ReservaServicioForm, SolicitudVidaForm
-from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, SolicitudVida, Recibo, Notificacion
+from .models import AfiliacionNatural, AfiliacionJuridica, Usuario, Credencial, Convenio, Servicio, Reserva, Empresa, Recibo, Notificacion, Beneficio
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import Group
@@ -17,13 +18,11 @@ from django.core.mail import send_mail
 from django.contrib.auth import update_session_auth_hash
 from django.template.loader import render_to_string, get_template
 from django.db import IntegrityError
+from django.http import HttpResponseRedirect
 import logging
 from django.urls import reverse
 from django.shortcuts import redirect, render
-from .forms import EmpresaForm
-from .models import Empresa
 import weasyprint
-
 # Create your views here.
 def get_user_group(user):
     if user.is_superuser or user.is_staff:
@@ -54,7 +53,7 @@ def home(request):
             print("[HOME] Renderizando vista_socio_registrado/home.html por tipo_usuario")
             reservas = []
             # Obtiene las notificaciones del usuario
-            from .models import Notificacion
+            
             notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_envio')
             return render(request, 'vista_socio_registrado/home.html', {
                 'reservas': reservas,
@@ -88,8 +87,7 @@ def login_view(request):
         identificador_normalizado = identificador.strip().lower()
         print(f"[LOGIN] Identificador normalizado: {identificador_normalizado}")
 
-        # Lógica 1: superuser/staff de camara.Usuario (modelo custom)
-        from django.contrib.auth import get_user_model
+
         UserModel = get_user_model()
         try:
             user_obj = UserModel.objects.get(username__iexact=identificador_normalizado)
@@ -174,8 +172,6 @@ def registro(request):
         'tipo': tipo
     })
 
-from .forms import EmpresaForm
-from .models import Empresa
 
 def registro_empresa(request):
     if not request.user.is_authenticated:
@@ -284,7 +280,6 @@ def admin_home(request):
     grupo = get_user_group(request.user)
     if grupo != 'admin':
         return redirect('home')
-    from .models import Usuario, Empresa, Convenio, AfiliacionNatural, AfiliacionJuridica
 
     num_socios = Usuario.objects.filter(tipo_usuario='socio').count()
     num_empresas = Empresa.objects.count()
@@ -442,7 +437,6 @@ def admin_convenios_list(request):
 
 @admin_required
 def admin_convenio_create(request):
-    from .forms import ConvenioForm
     if request.method == 'POST':
         form = ConvenioForm(request.POST, request.FILES)
         if form.is_valid():
@@ -522,7 +516,6 @@ def admin_servicio_delete(request, pk):
 
 @admin_required
 def admin_reservas_list(request):
-    from .models import Reserva
     estado = request.GET.get('estado')
     reservas = Reserva.objects.select_related('usuario', 'servicio').all()
     if estado:
@@ -534,7 +527,6 @@ def admin_reservas_list(request):
 
 @admin_required
 def admin_reserva_estado(request, pk):
-    from .models import Reserva
     reserva = Reserva.objects.get(pk=pk)
     if request.method == 'POST':
         nuevo_estado = request.POST.get('estado')
@@ -594,7 +586,6 @@ def cambio_obligatorio_contrasena(request):
         if hasattr(request, "session"):
             request.session.flush()
         # Redirige a /login/ sin next, usando HttpResponseRedirect y borrando el parámetro GET
-        from django.http import HttpResponseRedirect
         response = HttpResponseRedirect('/login/')
         response.status_code = 302
         return response
@@ -605,7 +596,6 @@ def cambio_obligatorio_contrasena(request):
         if hasattr(request, "session"):
             request.session.flush()
         messages.error(request, 'La contraseña temporal ha expirado. Contacte al administrador.')
-        from django.http import HttpResponseRedirect
         response = HttpResponseRedirect('/login/')
         response.status_code = 302
         return response
@@ -650,7 +640,6 @@ def reservar_servicio(request, pk):
         'form': form,
     })
 
-from .models import SolicitudVida
 
 @login_required(login_url='/login/')
 def solicitar_seguro_vida(request):
@@ -670,7 +659,6 @@ def solicitar_seguro_vida(request):
 
 @permission_required('camara.add_notificacion', login_url='/login/')
 def admin_notificacion(request):
-    from .models import Usuario, Notificacion
     usuarios = Usuario.objects.filter(is_active=True)
     if request.method == 'POST':
         usuario_id = request.POST.get('usuario')
@@ -689,7 +677,6 @@ def admin_notificacion(request):
 
 @admin_required
 def admin_beneficio_create(request, convenio_id):
-    from .models import Convenio, Beneficio
     convenio = Convenio.objects.get(pk=convenio_id)
     if request.method == 'POST':
         descripciones = request.POST.getlist('descripcion')
@@ -702,7 +689,7 @@ def admin_beneficio_create(request, convenio_id):
 
 @admin_required
 def admin_beneficio_edit(request, pk):
-    from .models import Beneficio
+    
     beneficio = Beneficio.objects.get(pk=pk)
     if request.method == 'POST':
         descripcion = request.POST.get('descripcion')
@@ -717,7 +704,6 @@ def admin_beneficio_edit(request, pk):
 
 @admin_required
 def admin_beneficio_delete(request, pk):
-    from .models import Beneficio
     beneficio = Beneficio.objects.get(pk=pk)
     convenio = beneficio.convenio
     if request.method == 'POST':
@@ -763,12 +749,9 @@ def ver_recibo(request, pk):
         return redirect('historial_reservas')
     return render(request, 'vista_socio_registrado/recibo.html', {'recibo': recibo})
 
-from django.http import HttpResponse  # Asegúrate de tener esta importación
+
 
 def descargar_recibo_pdf(request, pk):
-    from .models import Recibo
-    from django.template.loader import get_template
-    import weasyprint
 
     recibo = Recibo.objects.get(pk=pk)
     template = get_template('vista_socio_registrado/recibo.html')
@@ -778,7 +761,6 @@ def descargar_recibo_pdf(request, pk):
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response)
     return response
 
-from .models import Empresa
 
 def admin_empresas_list(request):
     empresas = Empresa.objects.all().order_by('nombre')
